@@ -1,8 +1,7 @@
 package com.example.deepname.Controller;
 
-import com.example.deepname.Service.NameDebugService;
+import com.example.deepname.Service.FileService;
 import com.example.deepname.Utils.MyResponse;
-import com.example.deepname.VO.UserVO;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,18 +9,18 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/nameDebug")
-public class NameDebugController {
+@RequestMapping("/file")
+public class FileController {
 
     @Resource
-    private NameDebugService nameDebugService;
+    private FileService fileService;
 
     /**
      * 接收文件
      */
     @PostMapping("/uploadZip")
     public MyResponse upload(@Valid @RequestBody MultipartFile file){
-        return nameDebugService.upload(file);
+        return fileService.upload(file);
     }
 
 //    /**
@@ -37,7 +36,7 @@ public class NameDebugController {
      */
     @PostMapping("/git")
     public MyResponse downLoadFromUrl(@Valid @RequestBody String url){
-        return nameDebugService.downLoadFromUrl(url);
+        return fileService.downLoadFromUrl(url);
     }
 
 }

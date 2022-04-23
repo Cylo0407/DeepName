@@ -1,10 +1,9 @@
 package com.example.deepname.Service;
 
 import com.example.deepname.Utils.MyResponse;
-import com.example.deepname.VO.UserVO;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface NameDebugService {
+public interface FileService {
     /**
      * 接收文件
      * @param file 文件

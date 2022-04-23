@@ -1,6 +1,6 @@
 package com.example.deepname.Service.Impl;
 
-import com.example.deepname.Service.NameDebugService;
+import com.example.deepname.Service.FileService;
 import com.example.deepname.Utils.Global;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
@@ -20,7 +20,7 @@ import org.eclipse.jgit.api.Git;
 
 @Service
 @Transactional
-public class NameDebugServiceImpl implements NameDebugService {
+public class FileServiceImpl implements FileService {
     private static final String EMPTY_FILE = "上传文件不能为空!";
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
