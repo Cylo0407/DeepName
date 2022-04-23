@@ -21,18 +21,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public MyResponse register(UserVO userVO) {
         MyResponse response = new MyResponse();
-        response.setIsSuccess(true);
         List<User> users = userRepository.findAll();
         try {
             User user = UserMapper.INSTANCE.v2p(userVO);
             for (User u : users) {
-                if (u.getUsername().equals(user.getUsername()) || u.getEmail().equals(user.getEmail())) {
-                    response.setMsg("用户已存在!");
-                    response.setIsSuccess(false);
-                }
+                if (u.getUsername().equals(user.getUsername()) || u.getEmail().equals(user.getEmail()))
+                    return MyResponse.buildFailure("用户已存在!");
             }
-            if (response.getIsSuccess()) response.setData(userRepository.save(user));
-        } catch (Exception e){
+            if (response.getIsSuccess()) return MyResponse.buildSuccess(userRepository.save(user));
+        } catch (Exception e) {
             response.setIsSuccess(false);
             response.setMsg(e.getMessage());
             e.printStackTrace();
@@ -42,17 +39,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public MyResponse loginByUsername(UserVO userVO) {
-        MyResponse response = new MyResponse();
-        response.setIsSuccess(true);
         User user = UserMapper.INSTANCE.v2p(userVO);
         User u = userRepository.getUserByUsername(userVO.getUsername());
 
-        if (!user.getPassword().equals(u.getPassword())) {
-            response.setIsSuccess(false);
-            response.setMsg("用户名或密码错误!");
-        } else response.setData(UserMapper.INSTANCE.p2v(u));
-
-        return response;
+        if (!user.getPassword().equals(u.getPassword()))
+            return MyResponse.buildFailure("用户名或密码错误!");
+        else
+            return MyResponse.buildSuccess(UserMapper.INSTANCE.p2v(u));
     }
 
     @Override
@@ -62,12 +55,10 @@ public class UserServiceImpl implements UserService {
         User user = UserMapper.INSTANCE.v2p(userVO);
         User u = userRepository.getUserByEmail(userVO.getEmail());
 
-        if (!user.getPassword().equals(u.getPassword())) {
-            response.setIsSuccess(false);
-            response.setMsg("用户邮箱或密码错误!");
-        } else response.setData(UserMapper.INSTANCE.p2v(u));
+        if (!user.getPassword().equals(u.getPassword()))
+            return MyResponse.buildFailure("用户名或邮箱错误!");
+        else return MyResponse.buildSuccess(UserMapper.INSTANCE.p2v(u));
 
-        return response;
     }
 
 

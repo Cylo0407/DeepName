@@ -19,5 +19,5 @@ public interface UserMapper {
 
     @Mappings({})
     User v2p(UserVO userVO);
-    List<User> vList2pList(List<UserVO> penaltyVOList);
+    List<User> vList2pList(List<UserVO> userVOList);
 }
