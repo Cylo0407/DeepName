@@ -6,7 +6,8 @@ import com.example.deepname.Service.FileService;
 import com.example.deepname.Utils.Global;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
-import org.joda.time.DateTime;
+import com.example.deepname.VO.DirVO;
+import com.example.deepname.VO.RecordVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +47,11 @@ public class FileServiceImpl implements FileService {
         try {
             file.transferTo(new File(folder, filename));
             utils.unPack(Global.ZipPath + format + filename);
-            return MyResponse.buildSuccess(Global.localUrl + format + filename);
+
+            RecordVO recordVO = new RecordVO();
+            recordVO.setFilename(filename);
+            recordVO.setFilepath(Global.localUrl + format + filename);
+            return MyResponse.buildSuccess(recordVO);
         } catch (IOException e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
@@ -136,14 +141,14 @@ public class FileServiceImpl implements FileService {
             cc.setDirectory(new File(path)).call();
             System.out.println("主仓下载完成。。。");
 
-            response.setIsSuccess(true);
-            response.setData(path);
+            RecordVO recordVO = new RecordVO();
+            recordVO.setFilename(filename);
+            recordVO.setFilepath(path);
+            return MyResponse.buildSuccess(recordVO);
         } catch (Exception e) {
-            response.setIsSuccess(false);
-            response.setMsg(e.getMessage());
             e.printStackTrace();
+            return MyResponse.buildFailure(e.getMessage());
         }
-        return response;
     }
 
     @Override
@@ -151,11 +156,20 @@ public class FileServiceImpl implements FileService {
         File srcFile = new File(dirpath);
         File[] fileArray = srcFile.listFiles();
         List<String> filenames = new LinkedList<>();
+        DirVO dirVO = new DirVO();
+        List<String> files = new LinkedList<>();
+        List<String> dirs = new LinkedList<>();
         for (int i = 0; i < fileArray.length; i++) {
-            filenames.add(fileArray[i].toString());
+            if ((fileArray[i].toString()).contains("."))
+                files.add(fileArray[i].toString());
+            else dirs.add(fileArray[i].toString());
+//            filenames.add(fileArray[i].toString());
 //            System.out.println(fileArray[i].toString());
         }
-        return MyResponse.buildSuccess(filenames);
+        dirVO.setParentPath(dirpath.substring(10));
+        dirVO.setFiles(files);
+        dirVO.setDirs(dirs);
+        return MyResponse.buildSuccess(dirVO);
     }
 
     @Override
@@ -165,7 +179,7 @@ public class FileServiceImpl implements FileService {
         try {
             InputStreamReader isr = new InputStreamReader(new FileInputStream(javaFile), StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(isr);
-            String s = null;
+            String s = "";
             while ((s = br.readLine()) != null) {
                 result.append(System.lineSeparator() + s);
             }

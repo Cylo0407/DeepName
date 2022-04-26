@@ -21,6 +21,9 @@ public class Record {
     @Column(name = "username", length = 64, nullable = false)
     private String username;
 
+    @Column(name = "filename", length = 64, nullable = false)
+    private String filename;
+
     @Column(name = "filepath", nullable = false)
     private String filepath;    //源文件路径
 
@@ -44,6 +47,14 @@ public class Record {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public String getFilepath() {

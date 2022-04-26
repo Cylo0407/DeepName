@@ -6,6 +6,8 @@ public class RecordVO {
 
     private String username;
 
+    private String filename;
+
     private String filepath;    //源文件路径
 
     private String respath;    //结果路径
@@ -24,6 +26,14 @@ public class RecordVO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public String getFilepath() {
