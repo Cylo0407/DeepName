@@ -1,8 +1,11 @@
 package com.example.deepname.VO;
 
+import lombok.Data;
+
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+@Data
 public class UserVO {
     private Integer id; //用户主键
 

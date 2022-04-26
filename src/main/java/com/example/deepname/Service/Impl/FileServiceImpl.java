@@ -1,18 +1,25 @@
 package com.example.deepname.Service.Impl;
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClient;
 import com.example.deepname.Service.FileService;
 import com.example.deepname.Utils.Global;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -30,7 +37,6 @@ public class FileServiceImpl implements FileService {
         if (file.isEmpty())
             return MyResponse.buildFailure(EMPTY_FILE);
 
-        MyResponse response = new MyResponse();
         String format = sdf.format(new Date());
         File folder = new File(Global.ZipPath + format);
         if (!folder.isDirectory()) {
@@ -39,15 +45,33 @@ public class FileServiceImpl implements FileService {
         String filename = file.getOriginalFilename();
         try {
             file.transferTo(new File(folder, filename));
-            response.setIsSuccess(true);
             utils.unPack(Global.ZipPath + format + filename);
-            response.setData(Global.localUrl + format + filename);
+            return MyResponse.buildSuccess(Global.localUrl + format + filename);
         } catch (IOException e) {
-            response.setIsSuccess(false);
-            response.setMsg(e.getMessage());
             e.printStackTrace();
+            return MyResponse.buildFailure(e.getMessage());
         }
-        return response;
+//        try {
+//            String fileName = file.getOriginalFilename();
+//            String uuid = UUID.randomUUID().toString();
+//            fileName = uuid + '-' + fileName;
+//            String format = new DateTime().toString("yyyy/MM/dd");
+//            String filepath = Global.preName + format + "/" + fileName;  // 拼接文件完整路径: 2020/01/03/parker.jpg
+//            System.out.println(filepath);
+//            // 获取上传文件输入流
+//            InputStream in = file.getInputStream();
+//
+//            OSS ossClient = new OSSClient(Global.ENDPOINT, Global.ACCESS_KEY_ID, Global.ACCESS_KEY_SECRET);
+//            ossClient.putObject(Global.BACKET_NAME, filepath, in);
+//            ossClient.shutdown();
+//
+//            String path = "http://" + Global.BACKET_NAME + "." + Global.ENDPOINT + "/" + filepath;
+//
+//            return MyResponse.buildSuccess(path);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return MyResponse.buildFailure(e.getMessage());
+//        }
     }
 
 
@@ -99,7 +123,7 @@ public class FileServiceImpl implements FileService {
     }
 
 
-    //    @Override
+    @Override
     public MyResponse downLoadFromUrl(String url) {
         MyResponse response = new MyResponse();
         try {
@@ -122,8 +146,41 @@ public class FileServiceImpl implements FileService {
         return response;
     }
 
+    @Override
+    public MyResponse getDir(String dirpath) {
+        File srcFile = new File(dirpath);
+        File[] fileArray = srcFile.listFiles();
+        List<String> filenames = new LinkedList<>();
+        for (int i = 0; i < fileArray.length; i++) {
+            filenames.add(fileArray[i].toString());
+//            System.out.println(fileArray[i].toString());
+        }
+        return MyResponse.buildSuccess(filenames);
+    }
+
+    @Override
+    public MyResponse getFileCtx(String filepath) {
+        File javaFile = new File(filepath);
+        StringBuilder result = new StringBuilder();
+        try {
+            InputStreamReader isr = new InputStreamReader(new FileInputStream(javaFile), StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
+            String s = null;
+            while ((s = br.readLine()) != null) {
+                result.append(System.lineSeparator() + s);
+            }
+            br.close();
+            System.out.println(result.toString());
+            return MyResponse.buildSuccess(result.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return MyResponse.buildFailure(e.getMessage());
+        }
+    }
+
 //    public static void main(String[] args) {
-//        String url = "https://gitee.com/cheng0407/section1.git";
-//        downLoadFromUrl(url);
+//        String url = "/Users/cyl/deepname/src/main/java/com/example/deepname/Utils/utils.java";
+//        getFileCtx(url);
 //    }
+
 }

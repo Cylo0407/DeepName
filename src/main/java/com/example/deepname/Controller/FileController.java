@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.io.File;
 
 @RestController
 @RequestMapping("/file")
@@ -37,6 +38,22 @@ public class FileController {
     @PostMapping("/git")
     public MyResponse downLoadFromUrl(@Valid @RequestBody String url){
         return fileService.downLoadFromUrl(url);
+    }
+
+    /**
+     * 遍历文件目录
+     */
+    @GetMapping("/dir")
+    public MyResponse getDir(@Valid @RequestParam String dirpath){
+        return fileService.getDir(dirpath);
+    }
+
+    /**
+     * 返回文件内容
+     */
+    @GetMapping("/ctx")
+    public MyResponse getFileCtx(@Valid @RequestParam String filepath){
+        return fileService.getFileCtx(filepath);
     }
 
 }
