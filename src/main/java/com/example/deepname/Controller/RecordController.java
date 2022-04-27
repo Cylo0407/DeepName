@@ -26,7 +26,7 @@ public class RecordController {
      * 按用户名查找记录
      */
     @GetMapping("/nameSearch")
-    public MyResponse searchRecordsByUsername(@RequestParam String username){
+    public MyResponse searchRecordsByUsername(@RequestParam(value = "username") String username){
         return recordService.searchRecordsByUsername(username);
     }
 
@@ -34,7 +34,7 @@ public class RecordController {
      * 按id查找记录
      */
     @GetMapping("/idSearch")
-    public MyResponse searchRecordsById(@RequestParam Integer id){
+    public MyResponse searchRecordsById(@RequestParam(value = "id") Integer id){
         return recordService.searchRecordsById(id);
     }
 
@@ -42,7 +42,7 @@ public class RecordController {
      * 删除记录
      */
     @PostMapping("/delete")
-    public MyResponse deleteRecord(@RequestParam Integer id){
+    public MyResponse deleteRecord(@RequestParam(value = "id") Integer id){
         return recordService.deleteRecords(id);
     }
 
