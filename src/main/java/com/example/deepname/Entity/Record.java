@@ -27,11 +27,9 @@ public class Record {
     @Column(name = "filepath", nullable = false)
     private String filepath;    //源文件路径
 
-    @Column(name = "respath", nullable = false)
+    @Column(name = "respath")
     private String respath;    //结果路径
 
-
-//    private List reslist;     //推荐结果（文件、字符串 ？）
 
     public Integer getId() {
         return id;

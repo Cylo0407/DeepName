@@ -1,6 +1,7 @@
 package com.example.deepname.Service.Impl;
 
 import com.example.deepname.Entity.Record;
+import com.example.deepname.Exception.BussinessException;
 import com.example.deepname.Repository.RecordRepository;
 import com.example.deepname.Service.RecordService;
 import com.example.deepname.Utils.MyResponse;
@@ -19,13 +20,22 @@ public class RecordServiceImpl implements RecordService {
     @Resource
     private RecordRepository recordRepository;
 
-    @Override
-    public MyResponse addRecord(RecordVO recordVO) {
+    public RecordVO addRecord(RecordVO recordVO) {
         try {
             RecordVO rv = RecordMapper.INSTANCE.p2v(recordRepository.save(RecordMapper.INSTANCE.v2p(recordVO)));
-            return MyResponse.buildSuccess(rv);
+            return rv;
         } catch (DataAccessException e) {
-            return MyResponse.buildFailure("创建记录失败！");
+            throw new BussinessException("创建记录失败！");
+        }
+    }
+
+    @Override
+    public RecordVO updateRecord(RecordVO recordVO) {
+        try {
+            RecordVO rv = RecordMapper.INSTANCE.p2v(recordRepository.save(RecordMapper.INSTANCE.v2p(recordVO)));
+            return rv;
+        } catch (DataAccessException e) {
+            throw new BussinessException("修改记录失败！");
         }
     }
 

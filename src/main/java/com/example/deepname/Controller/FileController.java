@@ -20,8 +20,9 @@ public class FileController {
      * 接收文件
      */
     @PostMapping("/uploadZip")
-    public MyResponse upload(@RequestParam(value = "file") MultipartFile file){
-        return fileService.upload(file);
+    public MyResponse upload(@RequestParam(value = "username") String username,
+                             @RequestParam(value = "file") MultipartFile file) {
+        return fileService.upload(username, file);
     }
 
 //    /**
@@ -36,15 +37,16 @@ public class FileController {
      * 通过url下载文件
      */
     @RequestMapping("/git")
-    public MyResponse downLoadFromUrl(@RequestParam(value = "url") String url){
-        return fileService.downLoadFromUrl(url);
+    public MyResponse downLoadFromUrl(@RequestParam(value = "username") String username,
+                                      @RequestParam(value = "url") String url) {
+        return fileService.downLoadFromUrl(username, url);
     }
 
     /**
      * 遍历文件目录,获得下级目录结构
      */
     @GetMapping("/dir")
-    public MyResponse getDir(@RequestParam(value = "dirpath") String dirpath){
+    public MyResponse getDir(@RequestParam(value = "dirpath") String dirpath) {
         return fileService.getDir(dirpath);
     }
 
@@ -52,7 +54,7 @@ public class FileController {
      * 返回文件内容
      */
     @GetMapping("/ctx")
-    public MyResponse getFileCtx(@RequestParam(value = "filepath") String filepath){
+    public MyResponse getFileCtx(@RequestParam(value = "filepath") String filepath) {
         return fileService.getFileCtx(filepath);
     }
 

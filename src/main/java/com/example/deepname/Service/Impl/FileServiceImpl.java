@@ -2,12 +2,18 @@ package com.example.deepname.Service.Impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
+import com.example.deepname.Entity.Record;
+import com.example.deepname.Exception.BussinessException;
+import com.example.deepname.Repository.RecordRepository;
 import com.example.deepname.Service.FileService;
+import com.example.deepname.Service.RecordService;
 import com.example.deepname.Utils.Global;
+import com.example.deepname.Utils.VPMapper.RecordMapper;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
 import com.example.deepname.VO.DirVO;
 import com.example.deepname.VO.RecordVO;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,16 +31,21 @@ import java.util.UUID;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 
+import javax.annotation.Resource;
+
 
 @Service
 @Transactional
 public class FileServiceImpl implements FileService {
     private static final String EMPTY_FILE = "上传文件不能为空!";
 
+    @Resource
+    private RecordRepository recordRepository;
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd/");
 
     @Override
-    public MyResponse upload(MultipartFile file) {
+    public MyResponse upload(String username, MultipartFile file) {
         if (file.isEmpty())
             return MyResponse.buildFailure(EMPTY_FILE);
 
@@ -48,10 +59,11 @@ public class FileServiceImpl implements FileService {
             file.transferTo(new File(folder, filename));
             utils.unPack(Global.ZipPath + format + filename);
 
-            RecordVO recordVO = new RecordVO();
-            recordVO.setFilename(filename);
-            recordVO.setFilepath(Global.localUrl + format + filename);
-            return MyResponse.buildSuccess(recordVO);
+            Record record = new Record();
+            record.setUsername(username);
+            record.setFilename(filename);
+            record.setFilepath(Global.localUrl + format + filename);
+            return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
         } catch (IOException e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
@@ -81,56 +93,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public MyResponse uploadFloder(MultipartFile[] files) {
-        MyResponse response = new MyResponse();
-        if (files == null || files.length == 0) {
-            response.setIsSuccess(false);
-            response.setMsg(EMPTY_FILE);
-            return response;
-        }
-        response.setIsSuccess(true);
-
-        String format = sdf.format(new Date());
-        File folder = new File(Global.ZipPath + format);
-        if (!folder.isDirectory()) {
-            folder.mkdirs();
-        }
-
-        for (MultipartFile file : files) {
-            String filePath = Global.ZipPath + format + file.getOriginalFilename();
-            makeDir(filePath);
-            File dest = new File(filePath);
-            try {
-                file.transferTo(dest);
-            } catch (IllegalStateException | IOException e) {
-                response.setIsSuccess(false);
-                response.setMsg(e.getMessage());
-                e.printStackTrace();
-            }
-        }
-
-        return response;
-    }
-
-    /**
-     * 确保目录存在，不存在则创建
-     *
-     * @param filePath
-     */
-    private static void makeDir(String filePath) {
-        if (filePath.lastIndexOf('/') > 0) {
-            String dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
-            File dir = new File(dirPath);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-        }
-    }
-
-
-    @Override
-    public MyResponse downLoadFromUrl(String url) {
-        MyResponse response = new MyResponse();
+    public MyResponse downLoadFromUrl(String username, String url) {
         try {
             System.out.println("开始下载主仓。。。");
             CloneCommand cc = Git.cloneRepository().setURI(url);
@@ -141,10 +104,12 @@ public class FileServiceImpl implements FileService {
             cc.setDirectory(new File(path)).call();
             System.out.println("主仓下载完成。。。");
 
-            RecordVO recordVO = new RecordVO();
-            recordVO.setFilename(filename);
-            recordVO.setFilepath(path);
-            return MyResponse.buildSuccess(recordVO);
+            Record record = new Record();
+            record.setUsername(username);
+            record.setFilename(filename);
+            record.setFilepath(path);
+            System.out.println("记录添加完成");
+            return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
         } catch (Exception e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
@@ -155,7 +120,7 @@ public class FileServiceImpl implements FileService {
     public MyResponse getDir(String dirpath) {
         File srcFile = new File(dirpath);
         File[] fileArray = srcFile.listFiles();
-        List<String> filenames = new LinkedList<>();
+//        List<String> filenames = new LinkedList<>();
         DirVO dirVO = new DirVO();
         List<String> files = new LinkedList<>();
         List<String> dirs = new LinkedList<>();
@@ -193,8 +158,7 @@ public class FileServiceImpl implements FileService {
     }
 
 //    public static void main(String[] args) {
-//        String url = "/Users/cyl/deepname/src/main/java/com/example/deepname/Utils/utils.java";
-//        getFileCtx(url);
+//
 //    }
 
 }
