@@ -43,6 +43,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public MyResponse upload(String username, MultipartFile file) {
+        System.out.println(file);
         if (file.isEmpty())
             return MyResponse.buildFailure(EMPTY_FILE);
 
