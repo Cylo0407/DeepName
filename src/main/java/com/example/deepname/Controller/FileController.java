@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.File;
 
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/file")
 public class FileController {
@@ -22,6 +23,7 @@ public class FileController {
     @PostMapping("/uploadZip")
     public MyResponse upload(@RequestParam(value = "username") String username,
                              @RequestParam(value = "file") MultipartFile file) {
+        System.out.println(username);
         return fileService.upload(username, file);
     }
 
@@ -55,6 +57,7 @@ public class FileController {
      */
     @GetMapping("/ctx")
     public MyResponse getFileCtx(@RequestParam(value = "filepath") String filepath) {
+        System.out.println(filepath);
         return fileService.getFileCtx(filepath);
     }
 

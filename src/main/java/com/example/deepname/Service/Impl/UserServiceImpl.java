@@ -20,21 +20,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public MyResponse register(UserVO userVO) {
-        MyResponse response = new MyResponse();
         List<User> users = userRepository.findAll();
         try {
             User user = UserMapper.INSTANCE.v2p(userVO);
             for (User u : users) {
-                if (u.getUsername().equals(user.getUsername()) || u.getEmail().equals(user.getEmail()))
+                if (u.getUsername().equals(user.getUsername()))
                     return MyResponse.buildFailure("用户已存在!");
+                if (user.getEmail()!=null){
+                    if (u.getEmail()!=null){
+                        if (u.getEmail().equals(user.getEmail()))
+                            return MyResponse.buildFailure("邮箱已存在!");
+                    }
+                }
             }
-            if (response.getIsSuccess()) return MyResponse.buildSuccess(userRepository.save(user));
+            return MyResponse.buildSuccess(userRepository.save(user));
         } catch (Exception e) {
-            response.setIsSuccess(false);
-            response.setMsg(e.getMessage());
             e.printStackTrace();
+            return MyResponse.buildFailure(e.getLocalizedMessage());
         }
-        return response;
     }
 
     @Override

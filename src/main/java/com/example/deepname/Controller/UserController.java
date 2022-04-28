@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -19,7 +20,7 @@ public class UserController {
      * 用户注册
      */
     @PostMapping("/register")
-    public MyResponse register(@Valid @RequestBody UserVO userVO){
+    public MyResponse register(@Valid @RequestBody UserVO userVO) {
         return userService.register(userVO);
     }
 
@@ -28,7 +29,7 @@ public class UserController {
      * 用户名登录
      */
     @PostMapping("/loginByUsername")
-    public MyResponse loginByUsername(@Valid @RequestBody UserVO userVO){
+    public MyResponse loginByUsername(@Valid @RequestBody UserVO userVO) {
         return userService.loginByUsername(userVO);
     }
 
@@ -36,7 +37,7 @@ public class UserController {
      * 用户邮箱登录
      */
     @PostMapping("/loginByEmail")
-    public MyResponse loginByEmail(@Valid @RequestBody UserVO userVO){
+    public MyResponse loginByEmail(@Valid @RequestBody UserVO userVO) {
         return userService.loginByEmail(userVO);
     }
 

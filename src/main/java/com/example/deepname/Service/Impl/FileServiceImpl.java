@@ -21,12 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -131,7 +128,8 @@ public class FileServiceImpl implements FileService {
 //            filenames.add(fileArray[i].toString());
 //            System.out.println(fileArray[i].toString());
         }
-        dirVO.setParentPath(dirpath.substring(10));
+        int idx = dirpath.lastIndexOf('/');
+        dirVO.setParentPath(dirpath.substring(0,idx));
         dirVO.setFiles(files);
         dirVO.setDirs(dirs);
         return MyResponse.buildSuccess(dirVO);
