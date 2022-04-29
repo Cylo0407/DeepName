@@ -58,6 +58,7 @@ public class FileServiceImpl implements FileService {
 
             Record record = new Record();
             record.setUsername(username);
+            filename = filename.substring(0,filename.length()-4);
             record.setFilename(filename);
             record.setFilepath(Global.localUrl + format + filename);
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
