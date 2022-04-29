@@ -19,8 +19,8 @@ public class FileController {
      * 接收文件
      */
     @PostMapping("/uploadZip")
-    public MyResponse upload(@RequestParam("file") MultipartFile file,
-                             @RequestParam("username") String username) {
+    public MyResponse upload(@RequestParam(value = "file") MultipartFile file,
+                             @RequestParam(value = "username") String username) {
         return fileService.upload(username, file);
     }
 
