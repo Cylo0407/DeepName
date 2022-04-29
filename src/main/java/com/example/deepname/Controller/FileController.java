@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
-import java.io.File;
 
 @CrossOrigin(value = "http://localhost:8080")
 @RestController
@@ -57,8 +55,15 @@ public class FileController {
      */
     @GetMapping("/ctx")
     public MyResponse getFileCtx(@RequestParam(value = "filepath") String filepath) {
-        System.out.println(filepath);
         return fileService.getFileCtx(filepath);
+    }
+
+    /**
+     * 调用python服务
+     */
+    @GetMapping("/gtnm")
+    public MyResponse getPyService(@RequestParam(value = "id") Integer id) {
+        return fileService.getPyService(id);
     }
 
 }

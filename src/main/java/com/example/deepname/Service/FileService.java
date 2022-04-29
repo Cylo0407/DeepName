@@ -34,4 +34,11 @@ public interface FileService {
      * @param filepath 文件路径;
      */
     MyResponse getFileCtx(String filepath);
+
+    /**
+     * 调用python程序
+     *
+     * @param id 文件主键;
+     */
+    MyResponse getPyService(Integer id);
 }

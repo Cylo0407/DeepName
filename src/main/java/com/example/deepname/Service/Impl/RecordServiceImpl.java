@@ -20,6 +20,7 @@ public class RecordServiceImpl implements RecordService {
     @Resource
     private RecordRepository recordRepository;
 
+    @Override
     public RecordVO addRecord(RecordVO recordVO) {
         try {
             RecordVO rv = RecordMapper.INSTANCE.p2v(recordRepository.save(RecordMapper.INSTANCE.v2p(recordVO)));

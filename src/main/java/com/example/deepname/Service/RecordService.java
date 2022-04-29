@@ -5,6 +5,11 @@ import com.example.deepname.Utils.MyResponse;
 import com.example.deepname.VO.RecordVO;
 
 public interface RecordService {
+    /**
+     * 增加记录
+     * @param recordVO 历史记录对象
+     */
+    RecordVO addRecord(RecordVO recordVO);
 
     /**
      * 修改记录

@@ -30,7 +30,6 @@ import org.eclipse.jgit.api.Git;
 
 import javax.annotation.Resource;
 
-
 @Service
 @Transactional
 public class FileServiceImpl implements FileService {
@@ -129,7 +128,7 @@ public class FileServiceImpl implements FileService {
 //            System.out.println(fileArray[i].toString());
         }
         int idx = dirpath.lastIndexOf('/');
-        dirVO.setParentPath(dirpath.substring(0,idx));
+        dirVO.setParentPath(dirpath.substring(0, idx));
         dirVO.setFiles(files);
         dirVO.setDirs(dirs);
         return MyResponse.buildSuccess(dirVO);
@@ -154,6 +153,59 @@ public class FileServiceImpl implements FileService {
             return MyResponse.buildFailure(e.getMessage());
         }
     }
+
+    @Override
+    public MyResponse getPyService(Integer id) {
+        Record record = recordRepository.getRecordsById(id);
+        String dirpath = record.getFilepath();
+
+        Process proc1;
+        Process proc2;
+        Process proc3;
+        Process proc4;
+        Process proc_test;
+
+        int idx = dirpath.lastIndexOf('/');
+        String filename = dirpath.substring(idx);
+        try {
+            String cmd1 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/merge_project.py " +
+                    dirpath;
+            String cmd2 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/processor.py " +
+                    filename;
+            String cmd3 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/extract_data.py " +
+                    filename;
+            String cmd4 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/extract_data.py " +
+                    filename;
+            String cmd_test = "python /Users/cyl/PycharmProjects/GTNM/data_processing/test.py " +
+                    filename;
+            proc1 = Runtime.getRuntime().exec(cmd1);// 执行py文件
+            proc2 = Runtime.getRuntime().exec(cmd2);
+            proc3 = Runtime.getRuntime().exec(cmd3);
+            proc4 = Runtime.getRuntime().exec(cmd4);
+            proc_test = Runtime.getRuntime().exec(cmd_test);
+
+            //用输入输出流来截取结果
+//            BufferedReader in = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
+//            String line = "";
+//            while ((line = in.readLine()) != null) {
+//                System.out.println(line);
+//            }
+//            in.close();
+            proc1.waitFor();
+            proc2.waitFor();
+            proc3.waitFor();
+            proc4.waitFor();
+            proc_test.waitFor();
+
+            record.setRespath(Global.ResPath + filename + ".txt");
+
+            return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return MyResponse.buildFailure(e.getMessage());
+        }
+    }
+
 
 //    public static void main(String[] args) {
 //

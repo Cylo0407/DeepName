@@ -16,6 +16,23 @@ public class RecordController {
     private RecordService recordService;
 
     /**
+     * 增加记录
+     */
+    @PostMapping("/add")
+    public MyResponse addRecord(@Valid @RequestBody RecordVO recordVO){
+        return MyResponse.buildSuccess(recordService.addRecord(recordVO));
+    }
+
+    /**
+     * 修改记录
+     */
+    @PostMapping("/update")
+    public MyResponse updateRecord(@Valid @RequestBody RecordVO recordVO){
+        return MyResponse.buildSuccess(recordService.updateRecord(recordVO));
+    }
+
+
+    /**
      * 按用户名查找记录
      */
     @GetMapping("/nameSearch")
