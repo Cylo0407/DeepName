@@ -20,11 +20,11 @@ public class Global {
     public static String preName = "DeepName/Data/Zips/";
 
     //阿里云API的内或外网域名
-    public static String ENDPOINT = "oss-cn-beijing.aliyuncs.com";
+    public static String ENDPOINT = "";
     //阿里云API的密钥Access Key ID
     public static String ACCESS_KEY_ID = "";
     //阿里云API的密钥Access Key Secret
-    public static String ACCESS_KEY_SECRET = "";
+    public static String ACCESS_KEY_SECRET = "bBiYNPrmYjA1pmH5tKtt4XKqHQqVVH";
     //阿里云API的bucket名称
     public static String BACKET_NAME = "nju";
 
