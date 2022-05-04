@@ -20,7 +20,6 @@ public interface FileService {
      * @param url      路径;
      */
     MyResponse downLoadFromUrl(String username, String url);
-
     /**
      * 遍历目录结构
      *
@@ -41,4 +40,12 @@ public interface FileService {
      * @param id 文件主键;
      */
     MyResponse getPyService(Integer id);
+
+    /**
+     * 调用参数拓展
+     *
+     * @param filepath 文件路径
+     */
+    MyResponse getParamExpand(String filepath);
+
 }

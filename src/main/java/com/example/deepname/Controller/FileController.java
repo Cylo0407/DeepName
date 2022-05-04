@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.persistence.criteria.CriteriaBuilder;
 
 @CrossOrigin(value = "http://localhost:8080")
 @RestController
@@ -63,6 +64,17 @@ public class FileController {
     @GetMapping("/gtnm")
     public MyResponse getPyService(@RequestParam(value = "id") Integer id) {
         return fileService.getPyService(id);
+    }
+
+    /**
+     * 调用参数拓展
+     *
+     * @param filepath filepath
+     * @return 返回一个ParamRecommend的数组
+     */
+    @GetMapping("/paramRecommend")
+    public MyResponse getParamExpand(@RequestParam(value = "filepath") String filepath) {
+        return fileService.getParamExpand(filepath);
     }
 
 }

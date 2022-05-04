@@ -1,5 +1,6 @@
 package com.example.deepname.Service.Impl;
 
+import abbrivatiate_expander.src.Step2.HandleCSV;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
 import com.example.deepname.Entity.Record;
@@ -11,6 +12,7 @@ import com.example.deepname.Utils.Global;
 import com.example.deepname.Utils.VPMapper.RecordMapper;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
+import com.example.deepname.VO.AbbreviationRecommendVO;
 import com.example.deepname.VO.DirVO;
 import com.example.deepname.VO.RecordVO;
 import org.springframework.dao.DataAccessException;
@@ -58,7 +60,7 @@ public class FileServiceImpl implements FileService {
 
             Record record = new Record();
             record.setUsername(username);
-            filename = filename.substring(0,filename.length()-4);
+            filename = filename.substring(0, filename.length() - 4);
             record.setFilename(filename);
             record.setFilepath(Global.localUrl + format + filename);
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
@@ -203,6 +205,18 @@ public class FileServiceImpl implements FileService {
 
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
         } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return MyResponse.buildFailure(e.getMessage());
+        }
+    }
+
+    @Override
+    public MyResponse getParamExpand(String filepath) {
+        ArrayList<AbbreviationRecommendVO> recommendVOS;
+        try {
+            recommendVOS = HandleCSV.recommendProcess(filepath);
+            return MyResponse.buildSuccess(recommendVOS);
+        } catch (IOException e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
         }
