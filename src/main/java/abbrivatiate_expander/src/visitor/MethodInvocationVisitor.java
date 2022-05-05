@@ -51,7 +51,7 @@ public class MethodInvocationVisitor extends ASTVisitor {
         try {
             for (Object object : node.arguments()) {
                 Expression expression = (Expression) object;
-                ArrayList<Identifier> identifiers = Utils.parseExpression(expression);
+                ArrayList<Identifier> identifiers = Utils.parseExpression(expression, compilationUnit);
                 if (expression.resolveTypeBinding() == null) {
                     System.err.println(node.toString());
                     return super.visit(node);

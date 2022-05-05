@@ -44,7 +44,7 @@ public class MethodDeclarationVisitor extends ASTVisitor
 	public static MethodDeclarationInfo getMethodDeclarationInfo(MethodDeclaration node,
 			CompilationUnit compilationUnit)
 	{
-		SimpleVisitor simpleVisitor = new SimpleVisitor();
+		SimpleVisitor simpleVisitor = new SimpleVisitor(compilationUnit);
 		node.accept(simpleVisitor);
 		ArrayList<Identifier> identifiers = simpleVisitor.identifiers;
 

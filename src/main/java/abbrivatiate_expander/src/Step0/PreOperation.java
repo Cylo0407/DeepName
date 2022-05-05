@@ -16,28 +16,27 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class PreOperation {
     // 将java文件的格式预处理，删除所有的空行和注释
     public static void main(String[] args) {
-        preOperation(LX.javaSource);
+        preOperation(LX.javaSource, LX.javaTrim, LX.tempFile);
     }
 
-    public static void preOperation(String filePath) {
-        LX.javaSource = filePath;
-        File trimFile = new File(LX.javaTrim);
-        File tempFile = new File(LX.tempFile);
+    public static void preOperation(String filePath, String trimPath, String tempPath) {
+        File trimFile = new File(trimPath);
+        File tempFile = new File(tempPath);
         if (trimFile.exists()) {
             trimFile.delete();
         }
         if (tempFile.exists()) {
             tempFile.delete();
         }
-        FileFormater(LX.javaSource);
+        FileFormater(filePath, trimPath);
 
-        System.out.println(LX.javaTrim + "已经生成");
+        System.out.println(trimPath + "已经生成");
     }
 
-    public static void FileFormater(String javaFile) {
+    public static void FileFormater(String filePath, String trimPath) {
         byte[] input = null;
         try {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(javaFile));
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filePath));
             input = new byte[bufferedInputStream.available()];
             bufferedInputStream.read(input);
             bufferedInputStream.close();
@@ -55,13 +54,13 @@ public class PreOperation {
         astParser.setEnvironment(new String[]{}, new String[]{}, new String[]{}, true);
         CompilationUnit unit = (CompilationUnit) (astParser.createAST(null));
 //		System.out.println(unit.toString());
-        appendFile(unit.toString());
+        appendFile(unit.toString(), trimPath);
     }
 
-    public static void appendFile(String line) {
+    public static void appendFile(String line, String trimPath) {
         FileWriter fw = null;
         try {
-            File f = new File(LX.javaTrim);
+            File f = new File(trimPath);
             fw = new FileWriter(f, true);
         } catch (IOException e) {
             e.printStackTrace();

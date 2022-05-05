@@ -24,13 +24,13 @@ public class ExtractAST {
     public static void main(String[] args) throws IOException {
 //		Step0.PreOperation.main(null);
 
-        parseCode(LX.javaTrim);
+        parseCode(LX.javaTrim, LX.tempFile);
     }
 
-    public static void parseCode(String path) {
+    public static void parseCode(String trimPath, String tempPath) {
         byte[] input = null;
         try {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(path));
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(trimPath));
             input = new byte[bufferedInputStream.available()];
             bufferedInputStream.read(input);
             bufferedInputStream.close();
@@ -52,7 +52,7 @@ public class ExtractAST {
         CompilationUnit unit = (CompilationUnit) (astParser.createAST(null));
         LX.unit = unit;
 //		System.out.println(unit);
-        HandleOneFile resultOfOneFile = new HandleOneFile();
+        HandleOneFile resultOfOneFile = new HandleOneFile(tempPath);
         unit.accept(new ClassVisitor(unit, resultOfOneFile));
         unit.accept(new MethodDeclarationVisitor(unit, resultOfOneFile));
         unit.accept(new MethodInvocationVisitor(unit, resultOfOneFile));
@@ -71,7 +71,7 @@ public class ExtractAST {
         }
         resultOfOneFile.parse();
 
-        AllExpansions.postprocess();
+        AllExpansions.postprocess(tempPath);
         System.err.println("End");
     }
 

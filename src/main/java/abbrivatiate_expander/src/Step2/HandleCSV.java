@@ -6,17 +6,10 @@ import abbrivatiate_expander.src.Step1.ExtractAST;
 
 import abbrivatiate_expander.src.Wiki.Worm;
 
+import abbrivatiate_expander.src.expansion.AllExpansions;
 import com.example.deepname.VO.AbbreviationRecommendVO;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,14 +20,53 @@ public class HandleCSV {
     }
 
     public static ArrayList<AbbreviationRecommendVO> recommendProcess(String srcPath) throws IOException {
-        LX.javaSource = srcPath;
-        PreOperation.preOperation(LX.javaSource);
-        ExtractAST.parseCode(LX.javaTrim);
-        return HandleCSV.recommend();
+        File file = new File(srcPath);
+        String filename = file.getName();
+        if (!filename.contains(".java")) {
+            return new ArrayList<AbbreviationRecommendVO>();
+        } else {
+            String fileParent = file.getParent().replaceAll("\\\\", "/");
+            String trimPath = fileParent + "/trim_" + filename;
+            String tempPath = fileParent + "/temp_" + filename.substring(0, filename.length() - 5) + ".csv";
+            String resPath = fileParent + "/res_" + filename;
+            PreOperation.preOperation(srcPath, trimPath, tempPath);
+            ExtractAST.parseCode(trimPath, tempPath);
+            ArrayList<AbbreviationRecommendVO> res = HandleCSV.recommend(srcPath, tempPath, resPath);
+            try {
+                File trimFile = new File(trimPath);
+                File tempFile = new File(tempPath);
+                File resFile = new File(resPath);
+                if (trimFile.exists()) {
+                    if (trimFile.delete()) {
+                        System.out.println("trim deleted.");
+                    }
+                } else {
+                    System.out.println("trim not found.");
+                }
+                if (tempFile.exists()) {
+                    if (tempFile.delete()) {
+                        System.out.println("temp deleted.");
+                    }
+                } else {
+                    System.out.println("temp not found.");
+                }
+                if (resFile.exists()) {
+                    if (resFile.delete()) {
+                        System.out.println("res deleted.");
+                    }
+                } else {
+                    System.out.println("res not found.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            AllExpansions.reInit();
+            return res;
+        }
     }
 
-    public static ArrayList<AbbreviationRecommendVO> recommend() throws IOException {
-        HashMap<String, ArrayList<String>> fileData = readParseResult(LX.tempFile);
+    public static ArrayList<AbbreviationRecommendVO> recommend(String srcPath, String tempPath, String destPath) throws IOException {
+        HashMap<String, ArrayList<String>> fileData = readParseResult(tempPath);
         ArrayList<AbbreviationRecommendVO> resList = new ArrayList<AbbreviationRecommendVO>();
 
         for (String id : fileData.keySet()) {
@@ -132,7 +164,6 @@ public class HandleCSV {
                         possiExp.append(";");
                         expansionFull.append(possiExp);
                     }
-
                 }
 
                 // 推荐信息
@@ -156,7 +187,7 @@ public class HandleCSV {
             System.out.println("=============================================");
             WriteNode.writerNodes.add(new WriteNode(id, nameOfIdentifier + "-->" + expansionFull));
         }
-        FileReader();
+//        FileReader(srcPath, destPath);
         return resList;
 
         /*
@@ -175,9 +206,9 @@ public class HandleCSV {
     static BufferedReader br;
     static BufferedWriter bw;
 
-    public static void FileReader() throws IOException {
-        br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(LX.javaSource))));
-        bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(LX.javaDest))));
+    public static void FileReader(String srcPath, String destPath) throws IOException {
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(srcPath))));
+        bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(destPath))));
         String line;
         int lineNum = 0;
         while ((line = br.readLine()) != null) {

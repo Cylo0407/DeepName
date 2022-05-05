@@ -3,6 +3,7 @@ package abbrivatiate_expander.src.visitor;
 import java.util.ArrayList;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
@@ -16,6 +17,11 @@ import abbrivatiate_expander.src.Global.LX;
 public class SimpleVisitor extends ASTVisitor
 {
 	public ArrayList<Identifier> identifiers = new ArrayList<>();
+	public CompilationUnit compilationUnit;
+
+	public SimpleVisitor(CompilationUnit compilationUnit){
+		this.compilationUnit = compilationUnit;
+	}
 
 	@Override
 	public boolean visit(SimpleName node)
@@ -31,7 +37,7 @@ public class SimpleVisitor extends ASTVisitor
 			String id = node.resolveBinding().getKey();
 			String name = node.resolveBinding().getName().toString();
 
-			LX.IdLineInFile.put(id, LX.unit.getLineNumber(node.getStartPosition()));
+			LX.IdLineInFile.put(id, this.compilationUnit.getLineNumber(node.getStartPosition()));
 //			System.out.println(id+"||"+name+"||"+Global.LX.unit.getLineNumber(node.getStartPosition()));
 			ClassName className = new ClassName(id, name);
 
@@ -43,7 +49,7 @@ public class SimpleVisitor extends ASTVisitor
 		case IBinding.METHOD: {
 			String id = node.resolveBinding().getKey();
 			String name = node.resolveBinding().getName().toString();
-			LX.IdLineInFile.put(id, LX.unit.getLineNumber(node.getStartPosition()));
+			LX.IdLineInFile.put(id, this.compilationUnit.getLineNumber(node.getStartPosition()));
 			if (node.resolveTypeBinding() == null)
 			{
 				System.err.println(node.toString());

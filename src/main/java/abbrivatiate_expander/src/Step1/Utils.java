@@ -10,14 +10,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 
-import abbrivatiate_expander.src.Global.LX;
 import abbrivatiate_expander.src.entity.Identifier;
 import abbrivatiate_expander.src.visitor.SimpleVisitor;
 
 public class Utils
 {
+
+    public String tempPath;
+
 	public static String getStringFromFile(String javaFile) throws IOException
 	{
 		BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(javaFile));
@@ -67,23 +70,23 @@ public class Utils
 		}
 	}
 
-	public static ArrayList<Identifier> parseExpression(Expression expression)
+	public static ArrayList<Identifier> parseExpression(Expression expression, CompilationUnit compilationUnit)
 	{
 		if (expression == null)
 		{
 			return null;
 		}
-		SimpleVisitor simpleVisitor = new SimpleVisitor();
+		SimpleVisitor simpleVisitor = new SimpleVisitor(compilationUnit);
 		expression.accept(simpleVisitor);
 		return simpleVisitor.identifiers;
 	}
 
-	public static void appendFile(String line)
+	public void appendFile(String line)
 	{
 		FileWriter fw = null;
 		try
 		{
-			File f = new File(LX.tempFile);
+			File f = new File(this.tempPath);
 
 			fw = new FileWriter(f, true);
 		} catch (IOException e)

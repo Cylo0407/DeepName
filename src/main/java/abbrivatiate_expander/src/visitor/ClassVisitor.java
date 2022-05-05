@@ -53,7 +53,7 @@ public class ClassVisitor extends ASTVisitor {
             line = compilationUnit.getLineNumber(node.getStartPosition() + javaDoc.getLength()) + 1;
         }
 
-        SimpleVisitor simpleVisitor = new SimpleVisitor();
+        SimpleVisitor simpleVisitor = new SimpleVisitor(this.compilationUnit);
         node.accept(simpleVisitor);
         ArrayList<Identifier> identifiers = simpleVisitor.identifiers;
         ArrayList<MethodName> methodNames = new ArrayList<>();
