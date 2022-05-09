@@ -14,6 +14,7 @@ import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
 import com.example.deepname.VO.AbbreviationRecommendVO;
 import com.example.deepname.VO.DirVO;
+import com.example.deepname.VO.MethodNameRecommendVO;
 import com.example.deepname.VO.RecordVO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 
 import javax.annotation.Resource;
+import javax.rmi.CORBA.Util;
 
 @Service
 @Transactional
@@ -54,13 +56,14 @@ public class FileServiceImpl implements FileService {
             folder.mkdirs();
         }
         String filename = file.getOriginalFilename();
+        filename = filename.substring(0, filename.length() - 4);
         try {
             file.transferTo(new File(folder, filename));
             utils.unPack(Global.ZipPath + format + filename);
 
             Record record = new Record();
             record.setUsername(username);
-            filename = filename.substring(0, filename.length() - 4);
+//            filename = filename.substring(0,filename.length()-4);
             record.setFilename(filename);
             record.setFilepath(Global.localUrl + format + filename);
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
@@ -159,55 +162,37 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public MyResponse getPyService(Integer id) {
-        Record record = recordRepository.getRecordsById(id);
-        String dirpath = record.getFilepath();
+    public MyResponse getPyService(String filepath) {
+        String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
+        String prename = filename.substring(0, filename.indexOf('.'));
 
-        Process proc1;
-        Process proc2;
-        Process proc3;
-        Process proc4;
-        Process proc_test;
+        String input_file_name = "D:/GTNM/deepname/temp/" + prename + '/' + prename + "_all.pkl";
+        String output_file_name = "D:/GTNM/deepname/temp/" + prename + '/' + prename;
+        File outputFile = new File("D:/GTNM/deepname/res/" + prename + '/' + prename + ".txt");
 
-        int idx = dirpath.lastIndexOf('/');
-        String filename = dirpath.substring(idx);
-        try {
-            String cmd1 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/merge_project.py " +
-                    dirpath;
-            String cmd2 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/processor.py " +
-                    filename;
-            String cmd3 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/extract_data.py " +
-                    filename;
-            String cmd4 = "python /Users/cyl/PycharmProjects/GTNM/data_processing/extract_data.py " +
-                    filename;
-            String cmd_test = "python /Users/cyl/PycharmProjects/GTNM/data_processing/test.py " +
-                    filename;
-            proc1 = Runtime.getRuntime().exec(cmd1);// 执行py文件
-            proc2 = Runtime.getRuntime().exec(cmd2);
-            proc3 = Runtime.getRuntime().exec(cmd3);
-            proc4 = Runtime.getRuntime().exec(cmd4);
-            proc_test = Runtime.getRuntime().exec(cmd_test);
-
-            //用输入输出流来截取结果
-//            BufferedReader in = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
-//            String line = "";
-//            while ((line = in.readLine()) != null) {
-//                System.out.println(line);
-//            }
-//            in.close();
-            proc1.waitFor();
-            proc2.waitFor();
-            proc3.waitFor();
-            proc4.waitFor();
-            proc_test.waitFor();
-
-            record.setRespath(Global.ResPath + filename + ".txt");
-
-            return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return MyResponse.buildFailure(e.getMessage());
+        if (!outputFile.exists()) {
+            utils.step1(filepath, prename);
+            utils.step2(prename);
+            utils.step3(input_file_name, output_file_name);
+            utils.step4(prename);
+            utils.step_test(prename);
         }
+        
+        ArrayList<MethodNameRecommendVO> resList = new ArrayList<MethodNameRecommendVO>();
+        try {
+            BufferedReader outputReader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile)));
+            String line = "";
+            while ((line = outputReader.readLine()) != null) {
+                String[] names = line.split(",");
+                resList.add(new MethodNameRecommendVO(names[0], names[1]));
+            }
+//            if(outputFile.exists()){
+//                outputFile.delete();
+//            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return MyResponse.buildSuccess(resList);
     }
 
     @Override
@@ -224,7 +209,9 @@ public class FileServiceImpl implements FileService {
 
 
 //    public static void main(String[] args) {
-//
+//        String dirpath = "D:/GTNM/deepname/file/2022/04/30/android-actionbar";
+//        String filename = "android-actionbar";
+//        getPyService(dirpath, filename);
 //    }
 
 }

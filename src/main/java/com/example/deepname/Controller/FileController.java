@@ -62,8 +62,8 @@ public class FileController {
      * 调用python服务
      */
     @GetMapping("/gtnm")
-    public MyResponse getPyService(@RequestParam(value = "id") Integer id) {
-        return fileService.getPyService(id);
+    public MyResponse getPyService(@RequestParam(value = "filepath") String filepath) {
+        return fileService.getPyService(filepath);
     }
 
     /**
