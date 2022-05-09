@@ -34,19 +34,4 @@ public interface FileService {
      * @param filepath 文件路径;
      */
     MyResponse getFileCtx(String filepath);
-
-    /**
-     * 调用python程序
-     *
-     * @param filepath 文件路径;
-     */
-    MyResponse getPyService(String filepath);
-
-    /**
-     * 调用参数拓展
-     *      *
-     * @param filepath 文件路径
-     */
-    MyResponse getParamExpand(String filepath);
-
 }

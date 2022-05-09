@@ -57,24 +57,4 @@ public class FileController {
     public MyResponse getFileCtx(@RequestParam(value = "filepath") String filepath) {
         return fileService.getFileCtx(filepath);
     }
-
-    /**
-     * 调用python服务
-     */
-    @GetMapping("/gtnm")
-    public MyResponse getPyService(@RequestParam(value = "filepath") String filepath) {
-        return fileService.getPyService(filepath);
-    }
-
-    /**
-     * 调用参数拓展
-     *
-     * @param filepath filepath
-     * @return 返回一个ParamRecommend的数组
-     */
-    @GetMapping("/paramRecommend")
-    public MyResponse getParamExpand(@RequestParam(value = "filepath") String filepath) {
-        return fileService.getParamExpand(filepath);
-    }
-
 }

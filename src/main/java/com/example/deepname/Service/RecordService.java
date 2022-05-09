@@ -1,6 +1,5 @@
 package com.example.deepname.Service;
 
-import com.example.deepname.Entity.Record;
 import com.example.deepname.Utils.MyResponse;
 import com.example.deepname.VO.RecordVO;
 

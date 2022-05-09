@@ -9,6 +9,7 @@ import com.example.deepname.Repository.RecordRepository;
 import com.example.deepname.Service.FileService;
 import com.example.deepname.Service.RecordService;
 import com.example.deepname.Utils.Global;
+import com.example.deepname.Utils.PythonRunner;
 import com.example.deepname.Utils.VPMapper.RecordMapper;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.Utils.MyResponse;
@@ -46,7 +47,6 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public MyResponse upload(String username, MultipartFile file) {
-        System.out.println(file);
         if (file.isEmpty())
             return MyResponse.buildFailure(EMPTY_FILE);
 
@@ -56,42 +56,27 @@ public class FileServiceImpl implements FileService {
             folder.mkdirs();
         }
         String filename = file.getOriginalFilename();
-        filename = filename.substring(0, filename.length() - 4);
+        String prename = filename.substring(0, filename.length() - 4);
+        String zipPath = Global.ZipPath + format + filename;
+        String filePath = Global.localUrl + format + prename;
+        System.out.println(filePath);
         try {
             file.transferTo(new File(folder, filename));
-            utils.unPack(Global.ZipPath + format + filename);
+            System.out.println(zipPath);
+            utils.unPack(zipPath);
+
+            if (!utils.hasjava(filePath))
+                return MyResponse.buildFailure("项目中不包含java文件!");
 
             Record record = new Record();
             record.setUsername(username);
-//            filename = filename.substring(0,filename.length()-4);
-            record.setFilename(filename);
-            record.setFilepath(Global.localUrl + format + filename);
+            record.setFilename(prename);
+            record.setFilepath(filePath);
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
         } catch (IOException e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
         }
-//        try {
-//            String fileName = file.getOriginalFilename();
-//            String uuid = UUID.randomUUID().toString();
-//            fileName = uuid + '-' + fileName;
-//            String format = new DateTime().toString("yyyy/MM/dd");
-//            String filepath = Global.preName + format + "/" + fileName;  // 拼接文件完整路径: 2020/01/03/parker.jpg
-//            System.out.println(filepath);
-//            // 获取上传文件输入流
-//            InputStream in = file.getInputStream();
-//
-//            OSS ossClient = new OSSClient(Global.ENDPOINT, Global.ACCESS_KEY_ID, Global.ACCESS_KEY_SECRET);
-//            ossClient.putObject(Global.BACKET_NAME, filepath, in);
-//            ossClient.shutdown();
-//
-//            String path = "http://" + Global.BACKET_NAME + "." + Global.ENDPOINT + "/" + filepath;
-//
-//            return MyResponse.buildSuccess(path);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return MyResponse.buildFailure(e.getMessage());
-//        }
     }
 
 
@@ -106,6 +91,9 @@ public class FileServiceImpl implements FileService {
             String path = Global.localUrl + format + filename;
             cc.setDirectory(new File(path)).call();
             System.out.println("主仓下载完成。。。");
+
+            if (!utils.hasjava(path))
+                return MyResponse.buildFailure("项目中不包含java文件!");
 
             Record record = new Record();
             record.setUsername(username);
@@ -123,20 +111,22 @@ public class FileServiceImpl implements FileService {
     public MyResponse getDir(String dirpath) {
         File srcFile = new File(dirpath);
         File[] fileArray = srcFile.listFiles();
-//        List<String> filenames = new LinkedList<>();
         DirVO dirVO = new DirVO();
-        List<String> files = new LinkedList<>();
+        List<String> javaFiles = new LinkedList<>();
+        List<String> otherFiles = new LinkedList<>();
         List<String> dirs = new LinkedList<>();
         for (int i = 0; i < fileArray.length; i++) {
-            if ((fileArray[i].toString()).contains("."))
-                files.add(fileArray[i].toString());
+            if ((fileArray[i].toString()).contains(".")) {
+                if ((fileArray[i].toString()).endsWith(".java"))
+                    javaFiles.add(fileArray[i].toString());
+                else otherFiles.add(fileArray[i].toString());
+            }
             else dirs.add(fileArray[i].toString());
-//            filenames.add(fileArray[i].toString());
-//            System.out.println(fileArray[i].toString());
         }
         int idx = dirpath.lastIndexOf('/');
         dirVO.setParentPath(dirpath.substring(0, idx));
-        dirVO.setFiles(files);
+        dirVO.setJavaFiles(javaFiles);
+        dirVO.setOtherFiles(otherFiles);
         dirVO.setDirs(dirs);
         return MyResponse.buildSuccess(dirVO);
     }
@@ -156,52 +146,6 @@ public class FileServiceImpl implements FileService {
             System.out.println(result.toString());
             return MyResponse.buildSuccess(result.toString());
         } catch (Exception e) {
-            e.printStackTrace();
-            return MyResponse.buildFailure(e.getMessage());
-        }
-    }
-
-    @Override
-    public MyResponse getPyService(String filepath) {
-        String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
-        String prename = filename.substring(0, filename.indexOf('.'));
-
-        String input_file_name = "D:/GTNM/deepname/temp/" + prename + '/' + prename + "_all.pkl";
-        String output_file_name = "D:/GTNM/deepname/temp/" + prename + '/' + prename;
-        File outputFile = new File("D:/GTNM/deepname/res/" + prename + '/' + prename + ".txt");
-
-        if (!outputFile.exists()) {
-            utils.step1(filepath, prename);
-            utils.step2(prename);
-            utils.step3(input_file_name, output_file_name);
-            utils.step4(prename);
-            utils.step_test(prename);
-        }
-        
-        ArrayList<MethodNameRecommendVO> resList = new ArrayList<MethodNameRecommendVO>();
-        try {
-            BufferedReader outputReader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile)));
-            String line = "";
-            while ((line = outputReader.readLine()) != null) {
-                String[] names = line.split(",");
-                resList.add(new MethodNameRecommendVO(names[0], names[1]));
-            }
-//            if(outputFile.exists()){
-//                outputFile.delete();
-//            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return MyResponse.buildSuccess(resList);
-    }
-
-    @Override
-    public MyResponse getParamExpand(String filepath) {
-        ArrayList<AbbreviationRecommendVO> recommendVOS;
-        try {
-            recommendVOS = HandleCSV.recommendProcess(filepath);
-            return MyResponse.buildSuccess(recommendVOS);
-        } catch (IOException e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
         }
