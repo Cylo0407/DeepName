@@ -1,17 +1,19 @@
 package com.example.deepname.VO;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class AbbreviationRecommendVO {
     private String param_name;
     private String method_name;
-    private List<String> possible_recommends;
+//    private List<String> possible_recommends;
+    private HashMap<String,Float> possible_recommends;
 
     public AbbreviationRecommendVO() {
 
     }
 
-    public AbbreviationRecommendVO(String param_name, String method_name, List<String> possible_recommends) {
+    public AbbreviationRecommendVO(String param_name, String method_name, HashMap<String,Float> possible_recommends) {
         this.param_name = param_name;
         this.method_name = method_name;
         this.possible_recommends = possible_recommends;
@@ -33,11 +35,11 @@ public class AbbreviationRecommendVO {
         this.method_name = method_name;
     }
 
-    public List<String> getPossible_recommends() {
+    public HashMap<String,Float> getPossible_recommends() {
         return possible_recommends;
     }
 
-    public void setPossible_recommends(List<String> possible_recommends) {
+    public void setPossible_recommends(HashMap<String,Float> possible_recommends) {
         this.possible_recommends = possible_recommends;
     }
 

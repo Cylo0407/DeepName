@@ -7,6 +7,7 @@ import abbrivatiate_expander.src.Step1.ExtractAST;
 import abbrivatiate_expander.src.Wiki.Worm;
 
 import abbrivatiate_expander.src.expansion.AllExpansions;
+import com.example.deepname.Utils.Levenshtein;
 import com.example.deepname.VO.AbbreviationRecommendVO;
 
 import java.io.*;
@@ -178,7 +179,14 @@ public class HandleCSV {
                 System.out.println("Method name:" + methodName);
                 System.out.println("Possible recommend names:" + String.join(",", possiWordArrayList));
                 if (possiWordArrayList.size() > 0) {
-                    resList.add(new AbbreviationRecommendVO(nameOfIdentifier, methodName, possiWordArrayList));
+                    // fix
+                    HashMap<String, Float> map = new HashMap<>();
+                    for (int i = 0; i <= possiWordArrayList.size(); i++) {
+                        String recommendName = possiWordArrayList.get(i);
+                        Float distance = Levenshtein.getSimilarity(nameOfIdentifier, recommendName);
+                        map.put(recommendName, distance);
+                    }
+                    resList.add(new AbbreviationRecommendVO(nameOfIdentifier, methodName, map));
                 }
             } else {
                 System.out.println("Has no recommend.");
