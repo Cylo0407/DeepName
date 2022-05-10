@@ -4,15 +4,17 @@ public class MethodNameRecommendVO {
     private String method_name;
     private String possible_recommend;
     private float distance;
+    private Integer location;
 
     public MethodNameRecommendVO() {
 
     }
 
-    public MethodNameRecommendVO(String method_name, String possible_recommend, float distance) {
+    public MethodNameRecommendVO(String method_name, String possible_recommend, float distance, Integer location) {
         this.method_name = method_name;
         this.possible_recommend = possible_recommend;
         this.distance = distance;
+        this.location = location;
     }
 
     public String getMethod_name() {
@@ -37,5 +39,13 @@ public class MethodNameRecommendVO {
 
     public void setDistance(float distance) {
         this.distance = distance;
+    }
+
+    public Integer getLocation() {
+        return location;
+    }
+
+    public void setLocation(Integer location) {
+        this.location = location;
     }
 }

@@ -5,6 +5,7 @@ import com.example.deepname.Service.RecommendService;
 import com.example.deepname.Utils.Levenshtein;
 import com.example.deepname.Utils.MyResponse;
 import com.example.deepname.Utils.PythonRunner;
+import com.example.deepname.Utils.utils;
 import com.example.deepname.VO.AbbreviationRecommendVO;
 import com.example.deepname.VO.MethodNameRecommendVO;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,8 @@ public class RecommendServiceImpl implements RecommendService {
             while ((line = outputReader.readLine()) != null) {
                 String[] names = line.split(",");
                 float distance = Levenshtein.getSimilarity(names[0], names[1]);
-                resList.add(new MethodNameRecommendVO(names[0], names[1], distance));
+                Integer location = utils.getLocation(filepath, names[0]);
+                resList.add(new MethodNameRecommendVO(names[0], names[1], distance, location));
             }
         } catch (IOException e) {
             e.printStackTrace();
