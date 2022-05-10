@@ -130,19 +130,19 @@ public class HandleCSV {
                             System.out.println("paramName=" + paramName);
                             StringBuilder expansionFull = new StringBuilder();
 
-                            ArrayList<String> possiWordArrayList = new ArrayList<String>();
+                            ArrayList<String> possibleWordArrayList = new ArrayList<String>();
                             for (String part : parts) {
                                 // 当前检测的部分
 //                            System.out.println(part);
 //                            System.out.println("part=" + part);
 //                            Wiki.Worm.wikili.put(part, Wiki.Worm.Wiki(part));
-                                possiWordArrayList = new ArrayList<String>();
+                                possibleWordArrayList = new ArrayList<String>();
                                 // Dictionary
                                 if (isInEnglishDic(part)) {
                                     continue;
                                 }
-                                isInAbbrDic(possiWordArrayList, part);
-                                isIncomputerAbbr(possiWordArrayList, part);
+                                isInAbbrDic(possibleWordArrayList, part);
+                                isIncomputerAbbr(possibleWordArrayList, part);
 
                                 // Dic
                                 for (int i = 3; i < 17; i++) // lx '<='-->'<'
@@ -166,8 +166,8 @@ public class HandleCSV {
                                                 if (Heu.H1(part, trueValue) || Heu.H2(part, trueValue)
                                                         || Heu.H3(part, trueValue)) {
                                                     System.err.println("param=" + trueValue);
-                                                    if (!possiWordArrayList.contains(trueValue))
-                                                        possiWordArrayList.add(trueValue);
+                                                    if (!possibleWordArrayList.contains(trueValue))
+                                                        possibleWordArrayList.add(trueValue);
                                                 }
                                             }
                                         }
@@ -176,14 +176,14 @@ public class HandleCSV {
                                         String comment = value.get(i);
 //                                    System.err.println(comment);
                                         for (String string : PossibleExpansionFromComment(part, comment)) {
-                                            if (!possiWordArrayList.contains(string))
-                                                possiWordArrayList.add(string);
+                                            if (!possibleWordArrayList.contains(string))
+                                                possibleWordArrayList.add(string);
                                         }
                                     }
                                     if (i == 16) {
                                         StringBuilder possiExp = new StringBuilder();
                                         possiExp.append(part);
-                                        for (String string : possiWordArrayList) {
+                                        for (String string : possibleWordArrayList) {
                                             possiExp.append("(").append(string).append(")");
                                         }
 //                                    if (possiWordArrayList.size() == 0) {
@@ -205,22 +205,21 @@ public class HandleCSV {
                                 }
 
                                 // 推荐信息
-                                for (String string : possiWordArrayList) {
+                                for (String string : possibleWordArrayList) {
                                     System.out.println("possi=" + string);
                                 }
                             }
                             if (!methodName.equals("")) {
                                 System.out.println("Parameter name:" + paramName);
                                 System.out.println("Method name:" + methodName);
-                                if (possiWordArrayList.size() > 0) {
-                                    System.out.println("Possible recommend names:" + String.join(",", possiWordArrayList));
-                                    HashMap<String, Float> possibleWordMap = new HashMap<>();
-                                    for (int i = 0; i <= possiWordArrayList.size(); i++) {
-                                        String recommendName = possiWordArrayList.get(i);
+                                if (possibleWordArrayList.size() > 0) {
+                                    System.out.println("Possible recommend names:" + String.join(",", possibleWordArrayList));
+                                    ArrayList<Float> recommendsDistance = new ArrayList<Float>();
+                                    for (String recommendName : possibleWordArrayList) {
                                         Float distance = Levenshtein.getSimilarity(paramName, recommendName);
-                                        possibleWordMap.put(recommendName, distance);
+                                        recommendsDistance.add(distance);
                                     }
-                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordMap, locationOfMethod));
+                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsDistance, locationOfMethod));
                                 }
                             } else {
                                 System.out.println("Has no recommend.");
@@ -259,16 +258,16 @@ public class HandleCSV {
             // 当前检测的parts，parts来自AST树中的一条的分词结果
             System.out.println("VariableName=" + variableName);
 
-            ArrayList<String> possiWordArrayList = new ArrayList<String>();
+            ArrayList<String> possibleWordArrayList = new ArrayList<String>();
             for (String part : parts) {
                 // 当前检测的部分
-                possiWordArrayList = new ArrayList<String>();
+                possibleWordArrayList = new ArrayList<String>();
                 // Dictionary
                 if (isInEnglishDic(part)) {
                     continue;
                 }
-                isInAbbrDic(possiWordArrayList, part);
-                isIncomputerAbbr(possiWordArrayList, part);
+                isInAbbrDic(possibleWordArrayList, part);
+                isIncomputerAbbr(possibleWordArrayList, part);
 
                 // Dic
                 for (int i = 3; i < 17; i++) // lx '<='-->'<'
@@ -289,8 +288,8 @@ public class HandleCSV {
                                 if (Heu.H1(part, trueValue) || Heu.H2(part, trueValue)
                                         || Heu.H3(part, trueValue)) {
                                     System.err.println("param=" + trueValue);
-                                    if (!possiWordArrayList.contains(trueValue))
-                                        possiWordArrayList.add(trueValue);
+                                    if (!possibleWordArrayList.contains(trueValue))
+                                        possibleWordArrayList.add(trueValue);
                                 }
                             }
                         }
@@ -298,14 +297,14 @@ public class HandleCSV {
                     if (i == 9) {
                         String comment = value.get(i);
                         for (String string : PossibleExpansionFromComment(part, comment)) {
-                            if (!possiWordArrayList.contains(string))
-                                possiWordArrayList.add(string);
+                            if (!possibleWordArrayList.contains(string))
+                                possibleWordArrayList.add(string);
                         }
                     }
                     if (i == 16) {
                         StringBuilder possiExp = new StringBuilder();
                         possiExp.append(part);
-                        for (String string : possiWordArrayList) {
+                        for (String string : possibleWordArrayList) {
                             possiExp.append("(").append(string).append(")");
                         }
                         possiExp.append(";");
@@ -313,21 +312,20 @@ public class HandleCSV {
                 }
 
                 // 推荐信息
-                for (String string : possiWordArrayList) {
+                for (String string : possibleWordArrayList) {
                     System.out.println("possi=" + string);
                 }
             }
 
             System.out.println("Variable name:" + variableName);
-            if (possiWordArrayList.size() > 0) {
-                System.out.println("Possible recommend names:" + String.join(",", possiWordArrayList));
-                HashMap<String, Float> possibleWordMap = new HashMap<>();
-                for (int i = 0; i <= possiWordArrayList.size(); i++) {
-                    String recommendName = possiWordArrayList.get(i);
+            if (possibleWordArrayList.size() > 0) {
+                System.out.println("Possible recommend names:" + String.join(",", possibleWordArrayList));
+                ArrayList<Float> recommendsDistance = new ArrayList<Float>();
+                for (String recommendName : possibleWordArrayList) {
                     Float distance = Levenshtein.getSimilarity(variableName, recommendName);
-                    possibleWordMap.put(recommendName, distance);
+                    recommendsDistance.add(distance);
                 }
-                resList.add(new AbbreviationRecommendVO(variableName, null, possibleWordMap, locationOfVariable));
+                resList.add(new AbbreviationRecommendVO(variableName, null, possibleWordArrayList, recommendsDistance, locationOfVariable));
             }
         }
     }

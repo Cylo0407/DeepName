@@ -13,10 +13,9 @@ public class Global {
             new UsernamePasswordCredentialsProvider(username, password);
 
     //文件目录
-    public static String localUrl = "D:/GTNM/deepname/file/";
-    public static String ZipPath = "D:/GTNM/deepname/zip/";
-    public static String ResPath = "D:/GTNM/deepname/res/";
-    public static String TempPath = "D:/GTNM/deepname/temp/";
+    public static String localUrl = "E:/Projects/datasets_dp/test_data/deepname/files/";
+    public static String ZipPath = "E:/Projects/datasets_dp/test_data/deepname/zips/";
+    public static String ResPath = "E:/Projects/datasets_dp/test_data/deepname/res/";
 
 
 

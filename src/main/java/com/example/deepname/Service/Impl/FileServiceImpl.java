@@ -138,9 +138,12 @@ public class FileServiceImpl implements FileService {
         try {
             InputStreamReader isr = new InputStreamReader(new FileInputStream(javaFile), StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(isr);
-            String s = "";
-            while ((s = br.readLine()) != null) {
-                result.append(System.lineSeparator() + s);
+            String s = br.readLine();
+            if (s != null) {
+                result.append(s);
+                while ((s = br.readLine()) != null) {
+                    result.append(System.lineSeparator()).append(s);
+                }
             }
             br.close();
             System.out.println(result.toString());
