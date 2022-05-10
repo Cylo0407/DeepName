@@ -208,175 +208,174 @@ public class AllExpansions {
 
         utils.appendFile("id," + "files," + "name," + "typeOfIdentifier," + "subclass," + "subsubclass," + "parents,"
                 + "ancestor," + "methods," + "fields," + "comment," + "type," + "enclosingClass," + "assignment,"
-                + "methodInvocated," + "parameterArgument," + "parameter," + "enclosingMethod" + "\n");
+                + "methodInvocated," + "parameterArgument," + "parameter," + "enclosingMethod," + "lineNum" + "\n");
 
         for (String id : idToClassName.keySet()) {
             if (!idToClassNameExpansions.keySet().contains(id)) {
-                utils.appendFile(commaToOther(id));
-                utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-                utils.appendFile("," + commaToOther(idToClassName.get(id).name));
-                utils.appendFile("," + commaToOther("ClassName"));
-                utils.appendFile(",,,,,,,,,,,,,,");
-                utils.appendFile("\n");
+                utils.appendFile(
+                        commaToOther(id)
+                                + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                                + "," + commaToOther(idToClassName.get(id).name)
+                                + "," + commaToOther("ClassName")
+                                + ",,,,,,,,,,,,,,"
+                                + "," + idToLineNum.get(id)
+                                + "\n"
+                );
             }
         }
         for (String id : idToMethodName.keySet()) {
             if (!idToMethodNameExpansions.keySet().contains(id)) {
-                utils.appendFile(commaToOther(id));
-                utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-                utils.appendFile("," + commaToOther(idToMethodName.get(id).name));
-                utils.appendFile("," + commaToOther("MethodName"));
-                utils.appendFile(",,,,,,,,,,,,,,");
-                utils.appendFile("\n");
+                utils.appendFile(
+                        commaToOther(id)
+                                + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                                + "," + commaToOther(idToMethodName.get(id).name)
+                                + "," + commaToOther("MethodName")
+                                + ",,,,,,,,,,,,,,"
+                                + "," + idToLineNum.get(id)
+                                + "\n"
+                );
             }
         }
         for (String id : idToParameter.keySet()) {
             if (!idToParameterNameExpansions.keySet().contains(id)) {
-                utils.appendFile(commaToOther(id));
-                utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-                utils.appendFile("," + commaToOther(idToParameter.get(id).name));
-                utils.appendFile("," + commaToOther("ParameterName"));
-                utils.appendFile(",,,,,,,,,,,,,,");
-                utils.appendFile("\n");
+                utils.appendFile(
+                        commaToOther(id)
+                                + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                                + "," + commaToOther(idToParameter.get(id).name)
+                                + "," + commaToOther("ParameterName")
+                                + ",,,,,,,,,,,,,,"
+                                + "," + idToLineNum.get(id)
+                                + "\n"
+                );
             }
         }
         for (String id : idToField.keySet()) {
             if (!idToFieldNameExpansions.keySet().contains(id)) {
-                utils.appendFile(commaToOther(id));
-                utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-                utils.appendFile("," + commaToOther(idToField.get(id).name));
-                utils.appendFile("," + commaToOther("FieldName"));
-                utils.appendFile(",,,,,,,,,,,,,,");
-                utils.appendFile("\n");
+                utils.appendFile(
+                        commaToOther(id)
+                                + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                                + "," + commaToOther(idToField.get(id).name)
+                                + "," + commaToOther("FieldName")
+                                + ",,,,,,,,,,,,,,"
+                                + "," + idToLineNum.get(id)
+                                + "\n"
+                );
             }
         }
         for (String id : idToVariable.keySet()) {
             if (!idToVariableNameExpansions.keySet().contains(id)) {
-                utils.appendFile(commaToOther(id));
-                utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-                utils.appendFile("," + commaToOther(idToVariable.get(id).name));
-                utils.appendFile("," + commaToOther("VariableName"));
-                utils.appendFile(",,,,,,,,,,,,,,");
-                utils.appendFile("\n");
+                utils.appendFile(
+                        commaToOther(id)
+                                + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                                + "," + commaToOther(idToVariable.get(id).name)
+                                + "," + commaToOther("VariableName")
+                                + ",,,,,,,,,,,,,,"
+                                + "," + idToLineNum.get(id)
+                                + "\n"
+                );
             }
         }
 
         for (String id : idToClassNameExpansions.keySet()) {
             ClassNameExpansions temp = idToClassNameExpansions.get(id);
-            utils.appendFile(commaToOther(id));
-            utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-            utils.appendFile("," + commaToOther(idToClassName.get(id).name));
-            utils.appendFile("," + commaToOther("ClassName"));
-            utils.appendFile("," + commaToOther(printHashSet(temp.subclass)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.subsubclass)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.parents)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.ancestor)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.methods)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.fields)));
-            utils.appendFile("," + commaToOther(printHashSetString(temp.comment)));
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile("\n");
+            utils.appendFile(
+                    commaToOther(id)
+                            + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                            + "," + commaToOther(idToClassName.get(id).name)
+                            + "," + commaToOther("ClassName")
+                            + "," + commaToOther(printHashSet(temp.subclass))
+                            + "," + commaToOther(printHashSet(temp.subsubclass))
+                            + "," + commaToOther(printHashSet(temp.parents))
+                            + "," + commaToOther(printHashSet(temp.ancestor))
+                            + "," + commaToOther(printHashSet(temp.methods))
+                            + "," + commaToOther(printHashSet(temp.fields))
+                            + "," + commaToOther(printHashSetString(temp.comment))
+                            + ",,,,,,,"
+                            + "," + idToLineNum.get(id)
+                            + "\n"
+            );
 
         }
         for (String id : idToMethodNameExpansions.keySet()) {
             MethodNameExpansions temp = idToMethodNameExpansions.get(id);
-            utils.appendFile(commaToOther(id));
-            utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-            utils.appendFile("," + commaToOther(idToMethodName.get(id).name));
-            utils.appendFile("," + commaToOther("MethodName"));
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSetString(temp.comment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.type)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.enclosingClass)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.assignment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.methodInvocated)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.parameterArgument)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.parameter)));
-            utils.appendFile(",");
-            utils.appendFile("\n");
-
+            utils.appendFile(
+                    commaToOther(id)
+                            + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                            + "," + commaToOther(idToMethodName.get(id).name)
+                            + "," + commaToOther("MethodName")
+                            + ",,,,,,"
+                            + "," + commaToOther(printHashSetString(temp.comment))
+                            + "," + commaToOther(printHashSet(temp.type))
+                            + "," + commaToOther(printHashSet(temp.enclosingClass))
+                            + "," + commaToOther(printHashSet(temp.assignment))
+                            + "," + commaToOther(printHashSet(temp.methodInvocated))
+                            + "," + commaToOther(printHashSet(temp.parameterArgument))
+                            + "," + commaToOther(printHashSet(temp.parameter))
+                            + ","
+                            + "," + idToLineNum.get(id)
+                            + "\n"
+            );
         }
         for (String id : idToFieldNameExpansions.keySet()) {
             FieldNameExpansions temp = idToFieldNameExpansions.get(id);
-            utils.appendFile(commaToOther(id));
-            utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-            utils.appendFile("," + commaToOther(idToField.get(id).name));
-            utils.appendFile("," + commaToOther("FieldName"));
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSetString(temp.comment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.type)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.enclosingClass)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.assignment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.methodInvocated)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.parameterArgument)));
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile("\n");
-
+            utils.appendFile(
+                    commaToOther(id)
+                            + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                            + "," + commaToOther(idToField.get(id).name)
+                            + "," + commaToOther("FieldName")
+                            + ",,,,,,"
+                            + "," + commaToOther(printHashSetString(temp.comment))
+                            + "," + commaToOther(printHashSet(temp.type))
+                            + "," + commaToOther(printHashSet(temp.enclosingClass))
+                            + "," + commaToOther(printHashSet(temp.assignment))
+                            + "," + commaToOther(printHashSet(temp.methodInvocated))
+                            + "," + commaToOther(printHashSet(temp.parameterArgument))
+                            + ","
+                            + ","
+                            + "," + idToLineNum.get(id)
+                            + "\n"
+            );
         }
         for (String id : idToParameterNameExpansions.keySet()) {
             ParameterNameExpansions temp = idToParameterNameExpansions.get(id);
-            utils.appendFile(commaToOther(id));
-            utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-            utils.appendFile("," + commaToOther(idToParameter.get(id).name));
-            utils.appendFile("," + commaToOther("ParameterName"));
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSetString(temp.comment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.type)));
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSet(temp.assignment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.methodInvocated)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.parameterArgument)));
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSet(temp.enclosingMethod)));
-            utils.appendFile("\n");
-
+            utils.appendFile(
+                    commaToOther(id)
+                            + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                            + "," + commaToOther(idToParameter.get(id).name)
+                            + "," + commaToOther("ParameterName")
+                            + ",,,,,,"
+                            + "," + commaToOther(printHashSetString(temp.comment))
+                            + "," + commaToOther(printHashSet(temp.type))
+                            + ","
+                            + "," + commaToOther(printHashSet(temp.assignment))
+                            + "," + commaToOther(printHashSet(temp.methodInvocated))
+                            + "," + commaToOther(printHashSet(temp.parameterArgument))
+                            + ","
+                            + "," + commaToOther(printHashSet(temp.enclosingMethod))
+                            + "," + idToLineNum.get(id)
+                            + "\n"
+            );
         }
         for (String id : idToVariableNameExpansions.keySet()) {
             VariableNameExpansions temp = idToVariableNameExpansions.get(id);
-            utils.appendFile(commaToOther(id));
-            utils.appendFile("," + commaToOther(printHashSetString(idToFiles.get(id))));
-            utils.appendFile("," + commaToOther(idToVariable.get(id).name));
-            utils.appendFile("," + commaToOther("VariableName"));
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSetString(temp.comment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.type)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.enclosingClass)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.assignment)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.methodInvocated)));
-            utils.appendFile("," + commaToOther(printHashSet(temp.parameterArgument)));
-            utils.appendFile(",");
-            utils.appendFile("," + commaToOther(printHashSet(temp.enclosingMethod)));
-            utils.appendFile("\n");
-
+            utils.appendFile(
+                    commaToOther(id)
+                            + "," + commaToOther(printHashSetString(idToFiles.get(id)))
+                            + "," + commaToOther(idToVariable.get(id).name)
+                            + "," + commaToOther("VariableName")
+                            + ",,,,,,"
+                            + "," + commaToOther(printHashSetString(temp.comment))
+                            + "," + commaToOther(printHashSet(temp.type))
+                            + "," + commaToOther(printHashSet(temp.enclosingClass))
+                            + "," + commaToOther(printHashSet(temp.assignment))
+                            + "," + commaToOther(printHashSet(temp.methodInvocated))
+                            + "," + commaToOther(printHashSet(temp.parameterArgument))
+                            + ","
+                            + "," + commaToOther(printHashSet(temp.enclosingMethod))
+                            + "," + idToLineNum.get(id)
+                            + "\n"
+            );
         }
-
     }
 
     private static String printHashSetString(HashSet<String> hashSet) {

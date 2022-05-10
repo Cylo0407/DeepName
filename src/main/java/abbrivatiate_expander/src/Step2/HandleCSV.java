@@ -30,8 +30,8 @@ public class HandleCSV {
             String trimPath = fileParent + "/trim_" + filename;
             String tempPath = fileParent + "/temp_" + filename.substring(0, filename.length() - 5) + ".csv";
             String resPath = fileParent + "/res_" + filename;
-            PreOperation.preOperation(srcPath, trimPath, tempPath);
-            ExtractAST.parseCode(trimPath, tempPath);
+//            PreOperation.preOperation(srcPath, trimPath, tempPath);
+            ExtractAST.parseCode(srcPath, tempPath);
             ArrayList<AbbreviationRecommendVO> res = HandleCSV.recommend(srcPath, tempPath, resPath);
             try {
                 File trimFile = new File(trimPath);
@@ -69,35 +69,199 @@ public class HandleCSV {
     public static ArrayList<AbbreviationRecommendVO> recommend(String srcPath, String tempPath, String destPath) throws IOException {
         HashMap<String, ArrayList<String>> fileData = readParseResult(tempPath);
         ArrayList<AbbreviationRecommendVO> resList = new ArrayList<AbbreviationRecommendVO>();
+        recommendMethodDeclarationParams(fileData, resList);
+        recommendMethodInvokedParams(fileData, resList);
+        return resList;
+    }
 
+    private static void recommendMethodDeclarationParams(HashMap<String, ArrayList<String>> fileData, ArrayList<AbbreviationRecommendVO> resList) {
+        // 获取方法的id
         for (String id : fileData.keySet()) {
-//          id 当前检测的内容
-//			System.out.println(id);
             ArrayList<String> value = fileData.get(id);
 
-            String nameOfIdentifier = value.get(1);
-            if (nameOfIdentifier.trim().equals(""))
+            // 如果不是方法则跳过
+            String type = value.get(2);
+            if (!type.equals("MethodName")) {
                 continue;
-//          把驼峰命名法的名称转为下划线分割，并分词
-            String[] partsRaw = (Util.CamelToUnderline(new StringBuffer(nameOfIdentifier))).toString().split("_");
+            }
+            // 如果方法没有参数则跳过
+            String params = value.get(15);
+            if (params.equals("")) {
+                continue;
+            }
 
+            // 函数名为空则跳过
+            String methodName = value.get(1);
+            if (methodName.trim().equals(""))
+                continue;
+            System.out.println("MethodName=" + methodName);
+
+            // 获取参数列表
+            String[] paramList = params.split(";");
+            ArrayList<String> paramNameList = new ArrayList<String>();
+            ArrayList<String> paramTypeList = new ArrayList<String>();
+            for (String param : paramList) {
+                paramNameList.add(param.split(":")[1]);
+            }
+            // 生成完整的函数名
+
+            // 获取行号
+            String locationOfMethod = value.get(17);
+
+            // 获取参数并解析
+            System.out.println("------------------------------");
+            for (String paramName : paramNameList) {
+                for (String paramId : fileData.keySet()) {
+                    ArrayList<String> paramValue = fileData.get(paramId);
+                    // 如果不是参数，跳过
+                    if (paramValue.get(2).equals("ParameterName")) {
+                        // 参数名和行号都相同，说明是同一参数，进行推荐
+                        if (paramValue.get(1).equals(paramName) && paramValue.get(17).equals(locationOfMethod)) {
+                            // 获取参数类型
+//                            paramTypeList.add(paramValue.get());
+                            // 把驼峰命名法的名称转为下划线分割，并分词
+                            String[] partsRaw = (Util.CamelToUnderline(new StringBuffer(paramName))).toString().split("_");
+                            ArrayList<String> parts = new ArrayList<String>();
+                            for (String string : partsRaw) {
+                                if (!string.equals(""))
+                                    parts.add(string);
+                            }
+                            // 当前检测的parts，parts来自AST树中的一条的分词结果
+                            System.out.println("paramName=" + paramName);
+                            StringBuilder expansionFull = new StringBuilder();
+
+                            ArrayList<String> possiWordArrayList = new ArrayList<String>();
+                            for (String part : parts) {
+                                // 当前检测的部分
+//                            System.out.println(part);
+//                            System.out.println("part=" + part);
+//                            Wiki.Worm.wikili.put(part, Wiki.Worm.Wiki(part));
+                                possiWordArrayList = new ArrayList<String>();
+                                // Dictionary
+                                if (isInEnglishDic(part)) {
+                                    continue;
+                                }
+                                isInAbbrDic(possiWordArrayList, part);
+                                isIncomputerAbbr(possiWordArrayList, part);
+
+                                // Dic
+                                for (int i = 3; i < 17; i++) // lx '<='-->'<'
+                                {
+                                    if (i != 9 && !value.get(i).equals("")) {
+                                        String rawValue = value.get(i);
+
+                                        System.out.println("raw=" + rawValue);
+                                        if (rawValue.contains(";")) {
+                                            String[] values = rawValue.split(";");
+                                            for (String string : values) {
+                                                String[] valueSplit = string.split(":");
+                                                if (valueSplit.length <= 1)
+                                                    continue;
+                                                String valuePrefix = valueSplit[0];
+                                                String trueValue = valueSplit[1];
+                                                System.out.println("Value=" + trueValue);
+                                                if (valuePrefix.equals("MethodName")) {
+                                                    methodName = trueValue;
+                                                }
+                                                if (Heu.H1(part, trueValue) || Heu.H2(part, trueValue)
+                                                        || Heu.H3(part, trueValue)) {
+                                                    System.err.println("param=" + trueValue);
+                                                    if (!possiWordArrayList.contains(trueValue))
+                                                        possiWordArrayList.add(trueValue);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (i == 9) {
+                                        String comment = value.get(i);
+//                                    System.err.println(comment);
+                                        for (String string : PossibleExpansionFromComment(part, comment)) {
+                                            if (!possiWordArrayList.contains(string))
+                                                possiWordArrayList.add(string);
+                                        }
+                                    }
+                                    if (i == 16) {
+                                        StringBuilder possiExp = new StringBuilder();
+                                        possiExp.append(part);
+                                        for (String string : possiWordArrayList) {
+                                            possiExp.append("(").append(string).append(")");
+                                        }
+//                                    if (possiWordArrayList.size() == 0) {
+//                                        // 当找不到推荐词汇时，从wiki中查询该词汇
+//
+//                                        HashSet<String> wiki = Worm.Wiki(part);
+//                                        if (wiki != null)
+//                                            for (String string : wiki) {
+//                                                System.out.println("wiki=" + string);
+//                                            }
+//                                        if (wiki != null)
+//                                            for (String string : wiki) {
+//                                                possiExp.append("[").append(string).append("]");
+//                                            }
+//                                    }
+                                        possiExp.append(";");
+                                        expansionFull.append(possiExp);
+                                    }
+                                }
+
+                                // 推荐信息
+                                for (String string : possiWordArrayList) {
+                                    System.out.println("possi=" + string);
+                                }
+                            }
+                            if (!methodName.equals("")) {
+                                System.out.println("Parameter name:" + paramName);
+                                System.out.println("Method name:" + methodName);
+                                if (possiWordArrayList.size() > 0) {
+                                    System.out.println("Possible recommend names:" + String.join(",", possiWordArrayList));
+                                    HashMap<String, Float> possibleWordMap = new HashMap<>();
+                                    for (int i = 0; i <= possiWordArrayList.size(); i++) {
+                                        String recommendName = possiWordArrayList.get(i);
+                                        Float distance = Levenshtein.getSimilarity(paramName, recommendName);
+                                        possibleWordMap.put(recommendName, distance);
+                                    }
+                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordMap, locationOfMethod));
+                                }
+                            } else {
+                                System.out.println("Has no recommend.");
+                            }
+                            WriteNode.writerNodes.add(new WriteNode(id, methodName + "-->" + expansionFull));
+                            break;
+                        }
+                    }
+                }
+            }
+            System.out.println("------------------------------");
+        }
+    }
+
+    private static void recommendMethodInvokedParams(HashMap<String, ArrayList<String>> fileData, ArrayList<AbbreviationRecommendVO> resList) {
+        for (String id : fileData.keySet()) {
+            ArrayList<String> value = fileData.get(id);
+
+            // 如果不是调用参数则跳过
+            String type = value.get(2);
+            if (!type.equals("VariableName")) {
+                continue;
+            }
+            String variableName = value.get(1);
+
+            // 获取行号
+            String locationOfVariable = value.get(17);
+
+            // 把驼峰命名法的名称转为下划线分割，并分词
+            String[] partsRaw = (Util.CamelToUnderline(new StringBuffer(variableName))).toString().split("_");
             ArrayList<String> parts = new ArrayList<String>();
             for (String string : partsRaw) {
                 if (!string.equals(""))
                     parts.add(string);
             }
-//          当前检测的parts，parts来自AST树中的一条的分词结果
-            System.out.println("name=" + nameOfIdentifier);
+            // 当前检测的parts，parts来自AST树中的一条的分词结果
+            System.out.println("VariableName=" + variableName);
 
-            StringBuilder expansionFull = new StringBuilder();
-            ArrayList<String> possiWordArrayList = null;
-            String methodName = "";
+            ArrayList<String> possiWordArrayList = new ArrayList<String>();
             for (String part : parts) {
-//              当前检测的部分
-//				System.out.println(part);
-//				System.out.println("part=" + part);
-//                	Wiki.Worm.wikili.put(part, Wiki.Worm.Wiki(part));
-
+                // 当前检测的部分
                 possiWordArrayList = new ArrayList<String>();
                 // Dictionary
                 if (isInEnglishDic(part)) {
@@ -107,7 +271,6 @@ public class HandleCSV {
                 isIncomputerAbbr(possiWordArrayList, part);
 
                 // Dic
-
                 for (int i = 3; i < 17; i++) // lx '<='-->'<'
                 {
                     if (i != 9 && !value.get(i).equals("")) {
@@ -123,9 +286,6 @@ public class HandleCSV {
                                 String valuePrefix = valueSplit[0];
                                 String trueValue = valueSplit[1];
                                 System.out.println("Value=" + trueValue);
-                                if (valuePrefix.equals("MethodName")) {
-                                    methodName = trueValue;
-                                }
                                 if (Heu.H1(part, trueValue) || Heu.H2(part, trueValue)
                                         || Heu.H3(part, trueValue)) {
                                     System.err.println("param=" + trueValue);
@@ -137,7 +297,6 @@ public class HandleCSV {
                     }
                     if (i == 9) {
                         String comment = value.get(i);
-//							System.err.println(comment);
                         for (String string : PossibleExpansionFromComment(part, comment)) {
                             if (!possiWordArrayList.contains(string))
                                 possiWordArrayList.add(string);
@@ -149,21 +308,7 @@ public class HandleCSV {
                         for (String string : possiWordArrayList) {
                             possiExp.append("(").append(string).append(")");
                         }
-//                        if (possiWordArrayList.size() == 0) {
-//                            // 当找不到推荐词汇时，从wiki中查询该词汇
-//
-//                            HashSet<String> wiki = Worm.Wiki(part);
-//                            if (wiki != null)
-//                                for (String string : wiki) {
-//                                    System.out.println("wiki=" + string);
-//                                }
-//                            if (wiki != null)
-//                                for (String string : wiki) {
-//                                    possiExp.append("[").append(string).append("]");
-//                                }
-//                        }
                         possiExp.append(";");
-                        expansionFull.append(possiExp);
                     }
                 }
 
@@ -171,45 +316,22 @@ public class HandleCSV {
                 for (String string : possiWordArrayList) {
                     System.out.println("possi=" + string);
                 }
-
             }
-            System.out.println("******");
-            if (!methodName.equals("")) {
-                System.out.println("Parameter name:" + nameOfIdentifier);
-                System.out.println("Method name:" + methodName);
+
+            System.out.println("Variable name:" + variableName);
+            if (possiWordArrayList.size() > 0) {
                 System.out.println("Possible recommend names:" + String.join(",", possiWordArrayList));
-                if (possiWordArrayList.size() > 0) {
-                    // fix
-                    HashMap<String, Float> map = new HashMap<>();
-                    for (int i = 0; i <= possiWordArrayList.size(); i++) {
-                        String recommendName = possiWordArrayList.get(i);
-                        Float distance = Levenshtein.getSimilarity(nameOfIdentifier, recommendName);
-                        map.put(recommendName, distance);
-                    }
-                    resList.add(new AbbreviationRecommendVO(nameOfIdentifier, methodName, map));
+                HashMap<String, Float> possibleWordMap = new HashMap<>();
+                for (int i = 0; i <= possiWordArrayList.size(); i++) {
+                    String recommendName = possiWordArrayList.get(i);
+                    Float distance = Levenshtein.getSimilarity(variableName, recommendName);
+                    possibleWordMap.put(recommendName, distance);
                 }
-            } else {
-                System.out.println("Has no recommend.");
+                resList.add(new AbbreviationRecommendVO(variableName, null, possibleWordMap, locationOfVariable));
             }
-            System.out.println("******");
-            System.out.println("=============================================");
-            WriteNode.writerNodes.add(new WriteNode(id, nameOfIdentifier + "-->" + expansionFull));
         }
-//        FileReader(srcPath, destPath);
-        return resList;
-
-        /*
-         * 前端需要的数据格式：
-         * [
-         *   {
-         *       param_name:String,
-         *       method_name:String,
-         *       possible_recommends:String[]
-         *   }
-         * ]
-         * */
-
     }
+
 
     static BufferedReader br;
     static BufferedWriter bw;
