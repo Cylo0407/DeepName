@@ -39,6 +39,8 @@ import javax.rmi.CORBA.Util;
 @Transactional
 public class FileServiceImpl implements FileService {
     private static final String EMPTY_FILE = "上传文件不能为空!";
+    private static final String EXCLUDED_JAVA = "项目中不包含java文件!";
+    private static final String EXCLUDED_README = "项目中不包含README文件!";
 
     @Resource
     private RecordRepository recordRepository;
@@ -66,7 +68,7 @@ public class FileServiceImpl implements FileService {
             utils.unPack(zipPath);
 
             if (!utils.hasjava(filePath))
-                return MyResponse.buildFailure("项目中不包含java文件!");
+                return MyResponse.buildFailure(EXCLUDED_JAVA);
 
             Record record = new Record();
             record.setUsername(username);
@@ -78,7 +80,6 @@ public class FileServiceImpl implements FileService {
             return MyResponse.buildFailure(e.getMessage());
         }
     }
-
 
     @Override
     public MyResponse downLoadFromUrl(String username, String url) {
@@ -93,7 +94,7 @@ public class FileServiceImpl implements FileService {
             System.out.println("主仓下载完成。。。");
 
             if (!utils.hasjava(path))
-                return MyResponse.buildFailure("项目中不包含java文件!");
+                return MyResponse.buildFailure(EXCLUDED_JAVA);
 
             Record record = new Record();
             record.setUsername(username);
@@ -120,8 +121,7 @@ public class FileServiceImpl implements FileService {
                 if ((fileArray[i].toString()).endsWith(".java"))
                     javaFiles.add(fileArray[i].toString());
                 else otherFiles.add(fileArray[i].toString());
-            }
-            else dirs.add(fileArray[i].toString());
+            } else dirs.add(fileArray[i].toString());
         }
         int idx = dirpath.lastIndexOf('/');
         dirVO.setParentPath(dirpath.substring(0, idx));
@@ -151,11 +151,35 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public MyResponse getPreView(String dirpath) {
+        File readme = new File(dirpath + '/' + "README.md");
+        if (!readme.exists())
+            return MyResponse.buildFailure(EXCLUDED_README);
+
+        StringBuilder result = new StringBuilder();
+        try {
+            InputStreamReader isr = new InputStreamReader(new FileInputStream(readme), StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
+            String s = "";
+            int i = 0;
+            while ((s = br.readLine()) != null && i < 10) {
+                result.append(System.lineSeparator() + s);
+                i++;
+            }
+            br.close();
+            return MyResponse.buildSuccess(result.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return MyResponse.buildFailure(e.getMessage());
+        }
+    }
+
 
 //    public static void main(String[] args) {
-//        String dirpath = "D:/GTNM/deepname/file/2022/04/30/android-actionbar";
-//        String filename = "android-actionbar";
-//        getPyService(dirpath, filename);
+//        String dirpath = "/Users/cyl/DeepName-2021-ICSE";
+//        MyResponse response = getPreView(dirpath);
+//        System.out.println(response.getData());
 //    }
 
 }

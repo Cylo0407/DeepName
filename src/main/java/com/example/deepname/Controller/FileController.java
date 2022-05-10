@@ -57,4 +57,13 @@ public class FileController {
     public MyResponse getFileCtx(@RequestParam(value = "filepath") String filepath) {
         return fileService.getFileCtx(filepath);
     }
+
+    /**
+     * 返回README.md内容
+     */
+    @GetMapping("/readme")
+    public MyResponse getPreView(@RequestParam(value = "dirpath") String dirpath) {
+        return fileService.getPreView(dirpath);
+    }
+
 }

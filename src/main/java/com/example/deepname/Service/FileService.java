@@ -34,4 +34,11 @@ public interface FileService {
      * @param filepath 文件路径;
      */
     MyResponse getFileCtx(String filepath);
+
+    /**
+     * 返回readme内容
+     *
+     * @param dirpath 目录路径;
+     */
+    MyResponse getPreView(String dirpath);
 }
