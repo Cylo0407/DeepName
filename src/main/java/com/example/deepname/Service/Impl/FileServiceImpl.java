@@ -164,11 +164,12 @@ public class FileServiceImpl implements FileService {
         try {
             InputStreamReader isr = new InputStreamReader(new FileInputStream(readme), StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(isr);
-            String s = "";
-            int i = 0;
-            while ((s = br.readLine()) != null && i < 10) {
-                result.append(System.lineSeparator() + s);
-                i++;
+            String s = br.readLine();
+            if (s != null) {
+                result.append(s);
+                while ((s = br.readLine()) != null) {
+                    result.append(System.lineSeparator()).append(s);
+                }
             }
             br.close();
             return MyResponse.buildSuccess(result.toString());
