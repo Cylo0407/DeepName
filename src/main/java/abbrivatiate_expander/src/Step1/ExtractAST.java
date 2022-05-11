@@ -27,10 +27,10 @@ public class ExtractAST {
         parseCode(LX.javaTrim, LX.tempFile);
     }
 
-    public static void parseCode(String trimPath, String tempPath) {
+    public static void parseCode(String srcPath, String tempPath) {
         byte[] input = null;
         try {
-            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(trimPath));
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(srcPath));
             input = new byte[bufferedInputStream.available()];
             bufferedInputStream.read(input);
             bufferedInputStream.close();

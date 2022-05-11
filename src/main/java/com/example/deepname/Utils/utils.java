@@ -1,5 +1,8 @@
 package com.example.deepname.Utils;
 
+import abbrivatiate_expander.src.Step1.ExtractAST;
+import abbrivatiate_expander.src.Step2.HandleCSV;
+import abbrivatiate_expander.src.expansion.AllExpansions;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
@@ -11,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class utils {
@@ -72,31 +76,25 @@ public class utils {
     }
 
     //返回方法行数
-    public static Integer getLocation(String filepath, String methodName) {
-        File javaFile = new File(filepath);
+    public static String getLocation(String filepath, String methodName) {
         try {
-            InputStreamReader isr = new InputStreamReader(new FileInputStream(javaFile), StandardCharsets.UTF_8);
-            BufferedReader br = new BufferedReader(isr);
-            String s = "";
-            int i = 1;
-            while ((s = br.readLine()) != null) {
-                if (s.trim().startsWith("public") || s.trim().startsWith("protected") || s.trim().startsWith("private")) {
-                    if (!s.contains(" class ")) {
-                        String temp = s.trim();
-                        temp = temp.substring(0, temp.indexOf('('));
-                        String name = temp.substring(temp.lastIndexOf(' ') + 1);
-                        if (name.equals(methodName)) {
-                            br.close();
-                            return i;
-                        }
+            String filename = filepath.substring(filepath.lastIndexOf('/') + 1, filepath.indexOf('.'));
+            HashMap<String, ArrayList<String>> fileData = HandleCSV.readParseResult(Global.csvPath + "temp_" + filename + ".csv");
+            for (String id : fileData.keySet()) {
+                ArrayList<String> value = fileData.get(id);
+                // 如果不是方法则跳过
+                String type = value.get(2);
+                if (type.equals("MethodName")) {
+                    String sourceMethodName = value.get(1);
+                    if (sourceMethodName.equals(methodName)) {
+                        // 如果方法名相同返回行号
+                        return value.get(17);
                     }
                 }
-                i++;
             }
-            br.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return -1;
+        return "-1";
     }
 }

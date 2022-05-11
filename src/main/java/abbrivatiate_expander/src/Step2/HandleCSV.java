@@ -7,6 +7,7 @@ import abbrivatiate_expander.src.Step1.ExtractAST;
 import abbrivatiate_expander.src.Wiki.Worm;
 
 import abbrivatiate_expander.src.expansion.AllExpansions;
+import com.example.deepname.Utils.Global;
 import com.example.deepname.Utils.Levenshtein;
 import com.example.deepname.VO.AbbreviationRecommendVO;
 
@@ -26,41 +27,39 @@ public class HandleCSV {
         if (!filename.contains(".java")) {
             return new ArrayList<AbbreviationRecommendVO>();
         } else {
-            String fileParent = file.getParent().replaceAll("\\\\", "/");
-            String trimPath = fileParent + "/trim_" + filename;
-            String tempPath = fileParent + "/temp_" + filename.substring(0, filename.length() - 5) + ".csv";
-            String resPath = fileParent + "/res_" + filename;
-//            PreOperation.preOperation(srcPath, trimPath, tempPath);
+            String filePath = Global.csvPath;
+            String tempPath = filePath + "temp_" + filename.substring(0, filename.length() - 5) + ".csv";
+            String resPath = filePath + "res_" + filename;
             ExtractAST.parseCode(srcPath, tempPath);
             ArrayList<AbbreviationRecommendVO> res = HandleCSV.recommend(srcPath, tempPath, resPath);
-            try {
-                File trimFile = new File(trimPath);
-                File tempFile = new File(tempPath);
-                File resFile = new File(resPath);
-                if (trimFile.exists()) {
-                    if (trimFile.delete()) {
-                        System.out.println("trim deleted.");
-                    }
-                } else {
-                    System.out.println("trim not found.");
-                }
-                if (tempFile.exists()) {
-                    if (tempFile.delete()) {
-                        System.out.println("temp deleted.");
-                    }
-                } else {
-                    System.out.println("temp not found.");
-                }
-                if (resFile.exists()) {
-                    if (resFile.delete()) {
-                        System.out.println("res deleted.");
-                    }
-                } else {
-                    System.out.println("res not found.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                File trimFile = new File(trimPath);
+//                File tempFile = new File(tempPath);
+//                File resFile = new File(resPath);
+//                if (trimFile.exists()) {
+//                    if (trimFile.delete()) {
+//                        System.out.println("trim deleted.");
+//                    }
+//                } else {
+//                    System.out.println("trim not found.");
+//                }
+//                if (tempFile.exists()) {
+//                    if (tempFile.delete()) {
+//                        System.out.println("temp deleted.");
+//                    }
+//                } else {
+//                    System.out.println("temp not found.");
+//                }
+//                if (resFile.exists()) {
+//                    if (resFile.delete()) {
+//                        System.out.println("res deleted.");
+//                    }
+//                } else {
+//                    System.out.println("res not found.");
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             AllExpansions.reInit();
             return res;
         }
@@ -405,7 +404,7 @@ public class HandleCSV {
         return temp;
     }
 
-    private static HashMap<String, ArrayList<String>> readParseResult(String fileName) {
+    public static HashMap<String, ArrayList<String>> readParseResult(String fileName) {
         HashMap<String, ArrayList<String>> idToInfos = new HashMap<>();
         ArrayList<String> lines = readFile(fileName);
         for (int i = 1; i < lines.size(); i++) {

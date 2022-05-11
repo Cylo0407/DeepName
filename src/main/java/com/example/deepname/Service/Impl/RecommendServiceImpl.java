@@ -42,7 +42,7 @@ public class RecommendServiceImpl implements RecommendService {
             while ((line = outputReader.readLine()) != null) {
                 String[] names = line.split(",");
                 float distance = Levenshtein.getSimilarity(names[0], names[1]);
-                Integer location = utils.getLocation(filepath, names[0]);
+                String location = utils.getLocation(filepath, names[0]);
                 resList.add(new MethodNameRecommendVO(names[0], names[1], distance, location));
             }
         } catch (IOException e) {
