@@ -38,9 +38,9 @@ import javax.rmi.CORBA.Util;
 @Service
 @Transactional
 public class FileServiceImpl implements FileService {
-    private static final String EMPTY_FILE = "ä¸Šä¼ æ–‡ä»¶ä¸èƒ½ä¸ºç©º!";
-    private static final String EXCLUDED_JAVA = "é¡¹ç›®ä¸­ä¸åŒ…å«javaæ–‡ä»¶!";
-    private static final String EXCLUDED_README = "é¡¹ç›®ä¸­ä¸åŒ…å«READMEæ–‡ä»¶!";
+    private static final String EMPTY_FILE = "ÉÏ´«ÎÄ¼şÄ¿Â¼Îª¿Õ!";
+    private static final String EXCLUDED_JAVA = "ÏîÄ¿ÖĞ²»°üº¬ÈÎºÎjavaÎÄ¼ş£¬µ¼ÈëÊ§°Ü";
+    private static final String EXCLUDED_README = "READMEÎÄ¼ş»ñÈ¡Ê§°Ü£¬¸ÃÏîÄ¿¿ÉÄÜÃ»ÓĞREADME.md";
 
     @Resource
     private RecordRepository recordRepository;
@@ -84,14 +84,14 @@ public class FileServiceImpl implements FileService {
     @Override
     public MyResponse downLoadFromUrl(String username, String url) {
         try {
-            System.out.println("å¼€å§‹ä¸‹è½½ä¸»ä»“ã€‚ã€‚ã€‚");
+            System.out.println("¿ªÊ¼ÏÂÔØÖ÷²Ö¡£¡£¡£");
             CloneCommand cc = Git.cloneRepository().setURI(url);
             cc.setCredentialsProvider(Global.credentialsProvider);
             String format = sdf.format(new Date());
             String filename = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
             String path = Global.localUrl + format + filename;
             cc.setDirectory(new File(path)).call();
-            System.out.println("ä¸»ä»“ä¸‹è½½å®Œæˆã€‚ã€‚ã€‚");
+            System.out.println("Ö÷²ÖÏÂÔØÍê³É¡£¡£¡£");
 
             if (!utils.hasjava(path))
                 return MyResponse.buildFailure(EXCLUDED_JAVA);
@@ -100,7 +100,7 @@ public class FileServiceImpl implements FileService {
             record.setUsername(username);
             record.setFilename(filename);
             record.setFilepath(path);
-            System.out.println("è®°å½•æ·»åŠ å®Œæˆ");
+            System.out.println("¼ÇÂ¼Ìí¼ÓÍê³É");
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
         } catch (Exception e) {
             e.printStackTrace();
