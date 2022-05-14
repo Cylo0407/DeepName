@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public class PreOperation {
-    // ½«javaÎÄ¼şµÄ¸ñÊ½Ô¤´¦Àí£¬É¾³ıËùÓĞµÄ¿ÕĞĞºÍ×¢ÊÍ
+    // å°†javaæ–‡ä»¶çš„æ ¼å¼é¢„å¤„ç†ï¼Œåˆ é™¤æ‰€æœ‰çš„ç©ºè¡Œå’Œæ³¨é‡Š
     public static void main(String[] args) {
         preOperation(LX.javaSource, LX.javaTrim, LX.tempFile);
     }
@@ -30,7 +30,7 @@ public class PreOperation {
         }
         FileFormater(filePath, trimPath);
 
-        System.out.println(trimPath + "ÒÑ¾­Éú³É");
+        System.out.println(trimPath + "å·²ç»ç”Ÿæˆ");
     }
 
     public static void FileFormater(String filePath, String trimPath) {

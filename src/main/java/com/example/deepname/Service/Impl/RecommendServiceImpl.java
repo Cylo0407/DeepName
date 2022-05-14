@@ -2,17 +2,16 @@ package com.example.deepname.Service.Impl;
 
 import abbrivatiate_expander.src.Step2.HandleCSV;
 import com.example.deepname.Service.RecommendService;
-import com.example.deepname.Utils.Levenshtein;
-import com.example.deepname.Utils.MyResponse;
-import com.example.deepname.Utils.PythonRunner;
-import com.example.deepname.Utils.utils;
+import com.example.deepname.Utils.*;
 import com.example.deepname.VO.AbbreviationRecommendVO;
 import com.example.deepname.VO.MethodNameRecommendVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -39,11 +38,23 @@ public class RecommendServiceImpl implements RecommendService {
         try {
             BufferedReader outputReader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile)));
             String line = "";
+            File methodNames = new File(Global.TempPath + prename + '/' + prename + ".txt");
+
+            BufferedReader signatureReader = new BufferedReader(new InputStreamReader(new FileInputStream(methodNames)));
+            ArrayList<String> signatures = new ArrayList<String>();
+            String signature = signatureReader.readLine();
+            while (signature != null) {
+                signatures.add(signature);
+                signature = signatureReader.readLine();
+            }
+
+            int idx = 0;
             while ((line = outputReader.readLine()) != null) {
                 String[] names = line.split(",");
                 float distance = Levenshtein.getSimilarity(names[0], names[1]);
-                String location = utils.getLocation(filepath, names[0]);
+                String location = utils.getLocation(prename, names[0], signatures.get(idx));
                 resList.add(new MethodNameRecommendVO(names[0], names[1], distance, location));
+                idx++;
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -6,16 +6,16 @@ import abbrivatiate_expander.src.expansion.AllExpansions;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class utils {
 
@@ -76,9 +76,8 @@ public class utils {
     }
 
     //返回方法行数
-    public static String getLocation(String filepath, String methodName) {
+    public static String getLocation(String filename, String methodName, String signature) {
         try {
-            String filename = filepath.substring(filepath.lastIndexOf('/') + 1, filepath.indexOf('.'));
             HashMap<String, ArrayList<String>> fileData = HandleCSV.readParseResult(Global.csvPath + "temp_" + filename + ".csv");
             for (String id : fileData.keySet()) {
                 ArrayList<String> value = fileData.get(id);
@@ -87,8 +86,23 @@ public class utils {
                 if (type.equals("MethodName")) {
                     String sourceMethodName = value.get(1);
                     if (sourceMethodName.equals(methodName)) {
-                        // 如果方法名相同返回行号
-                        return value.get(17);
+                        String parameters = value.get(15);
+                        ArrayList<String> params = new ArrayList<>(Arrays.asList(parameters.replaceAll("ParameterName:", "").split(";")));
+
+                        Pattern pattern = Pattern.compile(methodName + "([^)]*)");
+                        Matcher matcher = pattern.matcher(signature);
+                        ArrayList<String> signatureParams = new ArrayList<String>();
+                        if (matcher.find()) {
+                            signatureParams.addAll(Arrays.asList(matcher.group().split(",")));
+                        }
+                        for (int i = 0; i < signatureParams.size(); i++) {
+                            String[] temp = signatureParams.get(i).split(" ");
+                            signatureParams.set(i, temp[temp.length - 1]);
+                        }
+                        if (params.containsAll(signatureParams) && signatureParams.containsAll(params)) {
+                            // 如果方法名相同返回行号
+                            return value.get(17);
+                        }
                     }
                 }
             }
@@ -96,5 +110,12 @@ public class utils {
             e.printStackTrace();
         }
         return "-1";
+    }
+
+    public static void main(String[] args) {
+        String filename = "ActionBar";
+        String methodName = "addAction";
+        String signature = "    public void addAction(Action action, int index)";
+        getLocation(filename, methodName, signature);
     }
 }
