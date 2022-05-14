@@ -1,10 +1,7 @@
 package abbrivatiate_expander.src.Step2;
 
 import abbrivatiate_expander.src.Global.LX;
-import abbrivatiate_expander.src.Step0.PreOperation;
 import abbrivatiate_expander.src.Step1.ExtractAST;
-
-import abbrivatiate_expander.src.Wiki.Worm;
 
 import abbrivatiate_expander.src.expansion.AllExpansions;
 import com.example.deepname.Utils.Global;
@@ -14,25 +11,22 @@ import com.example.deepname.VO.AbbreviationRecommendVO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class HandleCSV {
     public static void main(String[] args) throws IOException {
         recommendProcess(LX.javaSource);
     }
 
-    public static ArrayList<AbbreviationRecommendVO> recommendProcess(String srcPath) throws IOException {
+    public static ArrayList<ArrayList<AbbreviationRecommendVO>> recommendProcess(String srcPath) throws IOException {
         File file = new File(srcPath);
         String filename = file.getName();
-        if (!filename.contains(".java")) {
-            return new ArrayList<AbbreviationRecommendVO>();
-        } else {
-            String filePath = Global.csvPath;
-            String tempPath = filePath + "temp_" + filename.substring(0, filename.length() - 5) + ".csv";
-            String resPath = filePath + "res_" + filename;
-            ExtractAST.parseCode(srcPath, tempPath);
-            ArrayList<AbbreviationRecommendVO> res = HandleCSV.recommend(srcPath, tempPath, resPath);
-//            try {
+
+        String filePath = Global.csvPath;
+        String tempPath = filePath + "temp_" + filename.substring(0, filename.length() - 5) + ".csv";
+        ExtractAST.parseCode(srcPath, tempPath);
+        ArrayList<AbbreviationRecommendVO> declarationParams = HandleCSV.recommendMethodDeclarationParams(tempPath);
+        ArrayList<AbbreviationRecommendVO> invokedParams = HandleCSV.recommendMethodInvokedParams(tempPath);
+        //            try {
 //                File trimFile = new File(trimPath);
 //                File tempFile = new File(tempPath);
 //                File resFile = new File(resPath);
@@ -60,16 +54,24 @@ public class HandleCSV {
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
-            AllExpansions.reInit();
-            return res;
-        }
+        ArrayList<ArrayList<AbbreviationRecommendVO>> res = new ArrayList<ArrayList<AbbreviationRecommendVO>>();
+        res.add(declarationParams);
+        res.add(invokedParams);
+        AllExpansions.reInit();
+        return res;
     }
 
-    public static ArrayList<AbbreviationRecommendVO> recommend(String srcPath, String tempPath, String destPath) throws IOException {
+    public static ArrayList<AbbreviationRecommendVO> recommendMethodInvokedParams(String tempPath) throws IOException {
+        HashMap<String, ArrayList<String>> fileData = readParseResult(tempPath);
+        ArrayList<AbbreviationRecommendVO> resList = new ArrayList<AbbreviationRecommendVO>();
+        recommendMethodInvokedParams(fileData, resList);
+        return resList;
+    }
+
+    public static ArrayList<AbbreviationRecommendVO> recommendMethodDeclarationParams(String tempPath) throws IOException {
         HashMap<String, ArrayList<String>> fileData = readParseResult(tempPath);
         ArrayList<AbbreviationRecommendVO> resList = new ArrayList<AbbreviationRecommendVO>();
         recommendMethodDeclarationParams(fileData, resList);
-        recommendMethodInvokedParams(fileData, resList);
         return resList;
     }
 
@@ -212,7 +214,7 @@ public class HandleCSV {
                                 System.out.println("Parameter name:" + paramName);
                                 System.out.println("Method name:" + methodName);
                                 if (possibleWordArrayList.size() > 0) {
-                                    System.out.println("Possible recommend names:" + String.join(",", possibleWordArrayList));
+                                    System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
                                     ArrayList<Float> recommendsDistance = new ArrayList<Float>();
                                     for (String recommendName : possibleWordArrayList) {
                                         Float distance = Levenshtein.getSimilarity(paramName, recommendName);
@@ -221,7 +223,7 @@ public class HandleCSV {
                                     resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsDistance, locationOfMethod));
                                 }
                             } else {
-                                System.out.println("Has no recommend.");
+                                System.out.println("Has no recommendMethodInvokedParams.");
                             }
                             WriteNode.writerNodes.add(new WriteNode(id, methodName + "-->" + expansionFull));
                             break;
@@ -244,8 +246,15 @@ public class HandleCSV {
             }
             String variableName = value.get(1);
 
-            // 获取行号
+            // 获取调用者函数名
+            String callerMethodName = value.get(16);
+            callerMethodName = callerMethodName.substring(0, callerMethodName.length() - 1).split(":")[1];
+
+            // 获取行号,如果为空则直接跳过
             String locationOfVariable = value.get(17);
+            if (locationOfVariable == null) {
+                continue;
+            }
 
             // 把驼峰命名法的名称转为下划线分割，并分词
             String[] partsRaw = (Util.CamelToUnderline(new StringBuffer(variableName))).toString().split("_");
@@ -318,13 +327,13 @@ public class HandleCSV {
 
             System.out.println("Variable name:" + variableName);
             if (possibleWordArrayList.size() > 0) {
-                System.out.println("Possible recommend names:" + String.join(",", possibleWordArrayList));
+                System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
                 ArrayList<Float> recommendsDistance = new ArrayList<Float>();
                 for (String recommendName : possibleWordArrayList) {
                     Float distance = Levenshtein.getSimilarity(variableName, recommendName);
                     recommendsDistance.add(distance);
                 }
-                resList.add(new AbbreviationRecommendVO(variableName, null, possibleWordArrayList, recommendsDistance, locationOfVariable));
+                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsDistance, locationOfVariable));
             }
         }
     }

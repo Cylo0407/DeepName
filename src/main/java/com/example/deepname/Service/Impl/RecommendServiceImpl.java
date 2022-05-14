@@ -7,12 +7,15 @@ import com.example.deepname.Utils.MyResponse;
 import com.example.deepname.Utils.PythonRunner;
 import com.example.deepname.Utils.utils;
 import com.example.deepname.VO.AbbreviationRecommendVO;
+import com.example.deepname.VO.MethodBlockRecommendsVO;
 import com.example.deepname.VO.MethodNameRecommendVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 @Service
 @Transactional
@@ -20,6 +23,10 @@ public class RecommendServiceImpl implements RecommendService {
 
     @Override
     public MyResponse getPyService(String filepath) {
+        return MyResponse.buildSuccess(getMethodNameRecommends(filepath));
+    }
+
+    private ArrayList<MethodNameRecommendVO> getMethodNameRecommends(String filepath) {
         String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
         String prename = filename.substring(0, filename.indexOf('.'));
 
@@ -48,12 +55,12 @@ public class RecommendServiceImpl implements RecommendService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return MyResponse.buildSuccess(resList);
+        return resList;
     }
 
     @Override
     public MyResponse getParamExpand(String filepath) {
-        ArrayList<AbbreviationRecommendVO> recommendVOS;
+        ArrayList<ArrayList<AbbreviationRecommendVO>> recommendVOS;
         try {
             recommendVOS = HandleCSV.recommendProcess(filepath);
             return MyResponse.buildSuccess(recommendVOS);
@@ -61,6 +68,50 @@ public class RecommendServiceImpl implements RecommendService {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());
         }
+    }
+
+    @Override
+    public MyResponse getAllRecommends(String filepath) {
+        try {
+            ArrayList<ArrayList<AbbreviationRecommendVO>> paramAndVariableRecommends = HandleCSV.recommendProcess(filepath);
+
+            ArrayList<MethodNameRecommendVO> methodRecommends = getMethodNameRecommends(filepath);
+            ArrayList<AbbreviationRecommendVO> paramRecommends = paramAndVariableRecommends.get(0);
+            ArrayList<AbbreviationRecommendVO> variableRecommends = paramAndVariableRecommends.get(1);
+            // 提取所有的方法名作为推荐集合
+            HashSet<String> allMethodNames = new HashSet<String>();
+            for (MethodNameRecommendVO vo : methodRecommends) {
+                allMethodNames.add(vo.getMethod_name());
+            }
+            for (AbbreviationRecommendVO vo : paramRecommends) {
+                allMethodNames.add(vo.getMethod_name());
+            }
+            for (AbbreviationRecommendVO vo : variableRecommends) {
+                allMethodNames.add(vo.getMethod_name());
+            }
+            // 将推荐集合转换为推荐映射
+            HashMap<String, MethodBlockRecommendsVO> recommendMapByMethodName = new HashMap<String, MethodBlockRecommendsVO>();
+            for (String methodName : allMethodNames) {
+                recommendMapByMethodName.put(methodName, new MethodBlockRecommendsVO(methodName));
+            }
+            // 将所有推荐内容存入推荐映射中
+            for (MethodNameRecommendVO vo : methodRecommends) {
+                recommendMapByMethodName.get(vo.getMethod_name()).addToMethod_recommend_infos(vo);
+            }
+            for (AbbreviationRecommendVO vo : paramRecommends) {
+                recommendMapByMethodName.get(vo.getMethod_name()).addToParam_recommend_infos(vo);
+            }
+            for (AbbreviationRecommendVO vo : variableRecommends) {
+                recommendMapByMethodName.get(vo.getMethod_name()).addToVariable_recommend_infos(vo);
+            }
+            // 把推荐集合返回
+            ArrayList<MethodBlockRecommendsVO> allRecommends = (ArrayList<MethodBlockRecommendsVO>) recommendMapByMethodName.values();
+            return MyResponse.buildSuccess(allMethodNames);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return MyResponse.buildFailure("推荐获取失败");
     }
 
 }

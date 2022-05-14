@@ -10,7 +10,7 @@ public class LX {
     public static String projectLocation = "E:/Projects/AbbreviationExpander/data/";
     public static String javaSource = projectLocation + "test.java";
     public static String javaTrim = projectLocation + "trim_" + "test.java";
-    public static String tempFile = projectLocation + "test_after.csv";
+    public static String tempFile = projectLocation + "temp_test.csv";
     public static String javaDest = projectLocation + "test_Exp.java";
 
     public static String rawSource;

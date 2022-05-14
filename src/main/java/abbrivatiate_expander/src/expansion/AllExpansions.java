@@ -1,5 +1,6 @@
 package abbrivatiate_expander.src.expansion;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -125,7 +126,8 @@ public class AllExpansions {
 
     public static void handleChildToParent() {
         for (String id : idToClassName.keySet()) {
-            if (idToClassName.get(id) instanceof ClassName) {
+            // 当它是一个className
+            if (idToClassName.get(id) != null) {
                 ArrayList<String> parents = childToParent.get(id);
                 ArrayList<String> ancestor = new ArrayList<>();
                 if (parents != null) {
@@ -203,6 +205,11 @@ public class AllExpansions {
     }
 
     private static void toFile(String tempPath) {
+        File tempFile = new File(tempPath);
+        if (tempFile.exists()) {
+            tempFile.delete();
+        }
+
         Utils utils = new Utils();
         utils.tempPath = tempPath;
 
