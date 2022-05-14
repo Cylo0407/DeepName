@@ -14,6 +14,11 @@ public class RecommendController {
     @Resource
     private RecommendService recommendService;
 
+    @GetMapping("/recommendAll")
+    public MyResponse getAllRecommends(@RequestParam(value = "filepath") String filepath) {
+        return recommendService.getAllRecommends(filepath);
+    }
+
     /**
      * 调用python服务
      */

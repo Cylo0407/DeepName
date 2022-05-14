@@ -17,6 +17,7 @@ import com.example.deepname.VO.AbbreviationRecommendVO;
 import com.example.deepname.VO.DirVO;
 import com.example.deepname.VO.MethodNameRecommendVO;
 import com.example.deepname.VO.RecordVO;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +103,8 @@ public class FileServiceImpl implements FileService {
             record.setFilepath(path);
             System.out.println("璁板綍娣诲姞瀹屾垚");
             return MyResponse.buildSuccess(RecordMapper.INSTANCE.p2v(recordRepository.save(record)));
+        } catch (JGitInternalException e) {
+            return MyResponse.buildFailure("该项目已经存在，请勿重复导入");
         } catch (Exception e) {
             e.printStackTrace();
             return MyResponse.buildFailure(e.getMessage());

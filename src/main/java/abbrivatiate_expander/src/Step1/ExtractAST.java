@@ -24,7 +24,7 @@ public class ExtractAST {
     public static void main(String[] args) throws IOException {
 //		Step0.PreOperation.main(null);
 
-        parseCode(LX.javaTrim, LX.tempFile);
+        parseCode(LX.javaSource, LX.tempFile);
     }
 
     public static void parseCode(String srcPath, String tempPath) {
