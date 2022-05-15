@@ -210,7 +210,16 @@ public class HandleCSV {
                                                 distance);
                                     }
                                     List<Map.Entry<AbbreviationRecommendVO, Float>> list = new ArrayList<>(map.entrySet());
-                                    Collections.sort(list, Comparator.comparingDouble(Map.Entry::getValue));
+                                    Collections.sort(list, new Comparator<Map.Entry<AbbreviationRecommendVO, Float>>() {
+                                        public int compare(Map.Entry<AbbreviationRecommendVO, Float> o1, Map.Entry<AbbreviationRecommendVO, Float> o2) {
+                                            if ((o1.getValue() - o2.getValue()) > 0)
+                                                return 1;
+                                            else if ((o1.getValue() - o2.getValue()) == 0)
+                                                return 0;
+                                            else
+                                                return -1;
+                                        }
+                                    });
                                     for (Map.Entry<AbbreviationRecommendVO, Float> c : list) {
                                         resList.add(c.getKey());
                                     }
@@ -333,7 +342,16 @@ public class HandleCSV {
                             distance);
                 }
                 List<Map.Entry<AbbreviationRecommendVO, Float>> list = new ArrayList<>(map.entrySet());
-                Collections.sort(list, Comparator.comparingDouble(Map.Entry::getValue));
+                Collections.sort(list, new Comparator<Map.Entry<AbbreviationRecommendVO, Float>>() {
+                    public int compare(Map.Entry<AbbreviationRecommendVO, Float> o1, Map.Entry<AbbreviationRecommendVO, Float> o2) {
+                        if ((o1.getValue() - o2.getValue()) > 0)
+                            return 1;
+                        else if ((o1.getValue() - o2.getValue()) == 0)
+                            return 0;
+                        else
+                            return -1;
+                    }
+                });
                 for (Map.Entry<AbbreviationRecommendVO, Float> c : list) {
                     resList.add(c.getKey());
                 }
