@@ -2,6 +2,7 @@ package com.example.deepname.VO;
 
 public class MethodNameRecommendVO {
     private String method_name;
+    private String method_signature;
     private String possible_recommend;
     private float distance;
     private String method_location;
@@ -10,8 +11,9 @@ public class MethodNameRecommendVO {
 
     }
 
-    public MethodNameRecommendVO(String method_name, String possible_recommend, float distance, String method_location) {
+    public MethodNameRecommendVO(String method_name, String method_signature, String possible_recommend, float distance, String method_location) {
         this.method_name = method_name;
+        this.method_signature = method_signature;
         this.possible_recommend = possible_recommend;
         this.distance = distance;
         this.method_location = method_location;
@@ -47,5 +49,13 @@ public class MethodNameRecommendVO {
 
     public void setMethod_location(String method_location) {
         this.method_location = method_location;
+    }
+
+    public String getMethod_signature() {
+        return method_signature;
+    }
+
+    public void setMethod_signature(String method_signature) {
+        this.method_signature = method_signature;
     }
 }

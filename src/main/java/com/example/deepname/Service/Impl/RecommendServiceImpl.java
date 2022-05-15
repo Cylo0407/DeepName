@@ -9,10 +9,8 @@ import com.example.deepname.VO.MethodNameRecommendVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -59,8 +57,8 @@ public class RecommendServiceImpl implements RecommendService {
             while ((line = outputReader.readLine()) != null) {
                 String[] names = line.split(",");
                 float distance = Levenshtein.getSimilarity(names[0], names[1]);
-                String location = utils.getLocation(prename, names[0], signatures.get(idx));
-                resList.add(new MethodNameRecommendVO(names[0], names[1], distance, location));
+                String location = utils.getLocation(filepath, names[0], signatures.get(idx));
+                resList.add(new MethodNameRecommendVO(names[0], signatures.get(idx).replace("$", "\n"), names[1], distance, location));
                 idx++;
             }
         } catch (IOException e) {
@@ -94,12 +92,6 @@ public class RecommendServiceImpl implements RecommendService {
             for (MethodNameRecommendVO vo : methodRecommends) {
                 allMethodNames.add(vo.getMethod_name());
             }
-            for (AbbreviationRecommendVO vo : paramRecommends) {
-                allMethodNames.add(vo.getMethod_name());
-            }
-            for (AbbreviationRecommendVO vo : variableRecommends) {
-                allMethodNames.add(vo.getMethod_name());
-            }
             // 将推荐集合转换为推荐映射
             HashMap<String, MethodBlockRecommendsVO> recommendMapByMethodName = new HashMap<String, MethodBlockRecommendsVO>();
             for (String methodName : allMethodNames) {
@@ -107,7 +99,7 @@ public class RecommendServiceImpl implements RecommendService {
             }
             // 将所有推荐内容存入推荐映射中
             for (MethodNameRecommendVO vo : methodRecommends) {
-                recommendMapByMethodName.get(vo.getMethod_name()).addToMethod_recommend_infos(vo);
+                recommendMapByMethodName.get(vo.getMethod_name()).setMethod_recommend_infos(vo);
             }
             for (AbbreviationRecommendVO vo : paramRecommends) {
                 recommendMapByMethodName.get(vo.getMethod_name()).addToParam_recommend_infos(vo);

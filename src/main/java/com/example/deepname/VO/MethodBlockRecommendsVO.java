@@ -4,13 +4,11 @@ import java.util.ArrayList;
 
 public class MethodBlockRecommendsVO {
     private String method_name;
-    private String method_signature;
-    private ArrayList<MethodNameRecommendVO> method_recommend_infos;
+    private MethodNameRecommendVO method_recommend_infos;
     private ArrayList<AbbreviationRecommendVO> param_recommend_infos;
     private ArrayList<AbbreviationRecommendVO> variable_recommend_infos;
 
     private MethodBlockRecommendsVO() {
-        this.method_recommend_infos = new ArrayList<>();
         this.param_recommend_infos = new ArrayList<>();
         this.variable_recommend_infos = new ArrayList<>();
     }
@@ -20,9 +18,14 @@ public class MethodBlockRecommendsVO {
         this.method_name = method_name;
     }
 
-    public MethodBlockRecommendsVO(String method_name, String method_signature, ArrayList<MethodNameRecommendVO> method_recommend_infos, ArrayList<AbbreviationRecommendVO> param_recommend_infos, ArrayList<AbbreviationRecommendVO> variable_recommend_infos) {
+    public MethodBlockRecommendsVO(String method_name, MethodNameRecommendVO method_recommend_infos) {
+        this();
         this.method_name = method_name;
-        this.method_signature = method_signature;
+        this.method_recommend_infos = method_recommend_infos;
+    }
+
+    public MethodBlockRecommendsVO(String method_name, MethodNameRecommendVO method_recommend_infos, ArrayList<AbbreviationRecommendVO> param_recommend_infos, ArrayList<AbbreviationRecommendVO> variable_recommend_infos) {
+        this.method_name = method_name;
         this.method_recommend_infos = method_recommend_infos;
         this.param_recommend_infos = param_recommend_infos;
         this.variable_recommend_infos = variable_recommend_infos;
@@ -52,24 +55,12 @@ public class MethodBlockRecommendsVO {
         this.variable_recommend_infos = variable_recommend_infos;
     }
 
-    public String getMethod_signature() {
-        return method_signature;
-    }
-
-    public void setMethod_signature(String method_signature) {
-        this.method_signature = method_signature;
-    }
-
-    public ArrayList<MethodNameRecommendVO> getMethod_recommend_infos() {
+    public MethodNameRecommendVO getMethod_recommend_infos() {
         return method_recommend_infos;
     }
 
-    public void setMethod_recommend_infos(ArrayList<MethodNameRecommendVO> method_recommend_infos) {
+    public void setMethod_recommend_infos(MethodNameRecommendVO method_recommend_infos) {
         this.method_recommend_infos = method_recommend_infos;
-    }
-
-    public void addToMethod_recommend_infos(MethodNameRecommendVO method_recommend_info) {
-        this.method_recommend_infos.add(method_recommend_info);
     }
 
     public void addToParam_recommend_infos(AbbreviationRecommendVO param_recommend_info) {

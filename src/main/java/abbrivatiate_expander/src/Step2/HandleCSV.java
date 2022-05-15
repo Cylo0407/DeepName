@@ -26,34 +26,18 @@ public class HandleCSV {
         ExtractAST.parseCode(srcPath, tempPath);
         ArrayList<AbbreviationRecommendVO> declarationParams = HandleCSV.recommendMethodDeclarationParams(tempPath);
         ArrayList<AbbreviationRecommendVO> invokedParams = HandleCSV.recommendMethodInvokedParams(tempPath);
-        //            try {
-//                File trimFile = new File(trimPath);
-//                File tempFile = new File(tempPath);
-//                File resFile = new File(resPath);
-//                if (trimFile.exists()) {
-//                    if (trimFile.delete()) {
-//                        System.out.println("trim deleted.");
-//                    }
-//                } else {
-//                    System.out.println("trim not found.");
-//                }
-//                if (tempFile.exists()) {
-//                    if (tempFile.delete()) {
-//                        System.out.println("temp deleted.");
-//                    }
-//                } else {
-//                    System.out.println("temp not found.");
-//                }
-//                if (resFile.exists()) {
-//                    if (resFile.delete()) {
-//                        System.out.println("res deleted.");
-//                    }
-//                } else {
-//                    System.out.println("res not found.");
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+        try {
+            File tempFile = new File(tempPath);
+            if (tempFile.exists()) {
+                if (tempFile.delete()) {
+                    System.out.println("temp deleted.");
+                }
+            } else {
+                System.out.println("temp not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<ArrayList<AbbreviationRecommendVO>> res = new ArrayList<ArrayList<AbbreviationRecommendVO>>();
         res.add(declarationParams);
         res.add(invokedParams);

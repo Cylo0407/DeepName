@@ -76,16 +76,25 @@ public class utils {
     }
 
     //返回方法行数
-    public static String getLocation(String filename, String methodName, String signature) {
+    public static String getLocation(String filepath, String methodName, String signature) {
+        String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
+        filename = filename.substring(0, filename.indexOf('.'));
+        String tempPath = Global.csvPath + "tempMethod_" + filename + ".csv";
         try {
-            HashMap<String, ArrayList<String>> fileData = HandleCSV.readParseResult(Global.csvPath + "temp_" + filename + ".csv");
+            ExtractAST.parseCodeDeclaration(filepath, tempPath);
+            HashMap<String, ArrayList<String>> fileData = HandleCSV.readParseResult(tempPath);
             for (String id : fileData.keySet()) {
                 ArrayList<String> value = fileData.get(id);
                 // 如果不是方法则跳过
                 String type = value.get(2);
                 if (type.equals("MethodName")) {
+                    // 如果行号为null则直接跳过
+                    String lineNum = value.get(17);
+                    if (lineNum.equals("null")) {
+                        continue;
+                    }
                     String sourceMethodName = value.get(1);
-                    if (sourceMethodName.equals(methodName)) {
+                    if (sourceMethodName.toLowerCase().equals(methodName.toLowerCase())) {
                         String parameters = value.get(15);
                         ArrayList<String> params = new ArrayList<>(Arrays.asList(parameters.replaceAll("ParameterName:", "").split(";")));
 
@@ -101,7 +110,7 @@ public class utils {
                         }
                         if (params.containsAll(signatureParams) && signatureParams.containsAll(params)) {
                             // 如果方法名相同返回行号
-                            return value.get(17);
+                            return lineNum;
                         }
                     }
                 }
