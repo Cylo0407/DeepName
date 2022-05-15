@@ -14,11 +14,6 @@ public class RecommendController {
     @Resource
     private RecommendService recommendService;
 
-    @GetMapping("/recommendAll")
-    public MyResponse getAllRecommends(@RequestParam(value = "filepath") String filepath) {
-        return recommendService.getAllRecommends(filepath);
-    }
-
     /**
      * 调用python服务
      */
@@ -36,6 +31,12 @@ public class RecommendController {
     @GetMapping("/paramRecommend")
     public MyResponse getParamExpand(@RequestParam(value = "filepath") String filepath) {
         return recommendService.getParamExpand(filepath);
+    }
+
+
+    @GetMapping("/recommendAll")
+    public MyResponse getAllRecommends(@RequestParam(value = "filepath") String filepath) {
+        return recommendService.getAllRecommends(filepath);
     }
 
 }

@@ -10,8 +10,7 @@ import com.example.deepname.VO.AbbreviationRecommendVO;
 import com.example.deepname.Utils.utils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class HandleCSV {
     public static void main(String[] args) throws IOException {
@@ -201,13 +200,21 @@ public class HandleCSV {
                                 if (possibleWordArrayList.size() > 0) {
                                     System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
                                     ArrayList<String> recommendsAccuracyTpe = new ArrayList<String>();
-                                    ArrayList<Float> recommendsDistance = new ArrayList<Float>();
+//                                    ArrayList<Float> recommendsDistance = new ArrayList<Float>();
+                                    HashMap<AbbreviationRecommendVO, Float> map = new HashMap<>();
                                     for (String recommendName : possibleWordArrayList) {
                                         Float distance = Levenshtein.getSimilarity(paramName, recommendName);
                                         recommendsAccuracyTpe.add(utils.getAccuracyType(distance));
-                                        recommendsDistance.add(distance);
+//                                        recommendsDistance.add(distance);
+                                        map.put(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsAccuracyTpe, locationOfMethod),
+                                                distance);
                                     }
-                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsAccuracyTpe, recommendsDistance, locationOfMethod));
+                                    List<Map.Entry<AbbreviationRecommendVO, Float>> list = new ArrayList<>(map.entrySet());
+                                    Collections.sort(list, Comparator.comparingDouble(Map.Entry::getValue));
+                                    for (Map.Entry<AbbreviationRecommendVO, Float> c : list) {
+                                        resList.add(c.getKey());
+                                    }
+//                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsAccuracyTpe, recommendsDistance, locationOfMethod));
                                 }
                             } else {
                                 System.out.println("Has no recommendMethodInvokedParams.");
@@ -316,13 +323,21 @@ public class HandleCSV {
             if (possibleWordArrayList.size() > 0) {
                 System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
                 ArrayList<String> recommendsAccuracy = new ArrayList<String>();
-                ArrayList<Float> recommendsDistance = new ArrayList<Float>();
+//                ArrayList<Float> recommendsDistance = new ArrayList<Float>();
+                HashMap<AbbreviationRecommendVO, Float> map = new HashMap<>();
                 for (String recommendName : possibleWordArrayList) {
                     Float distance = Levenshtein.getSimilarity(variableName, recommendName);
                     recommendsAccuracy.add(utils.getAccuracyType(distance));
-                    recommendsDistance.add(distance);
+//                    recommendsDistance.add(distance);
+                    map.put(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsAccuracy, locationOfVariable),
+                            distance);
                 }
-                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsAccuracy, recommendsDistance, locationOfVariable));
+                List<Map.Entry<AbbreviationRecommendVO, Float>> list = new ArrayList<>(map.entrySet());
+                Collections.sort(list, Comparator.comparingDouble(Map.Entry::getValue));
+                for (Map.Entry<AbbreviationRecommendVO, Float> c : list) {
+                    resList.add(c.getKey());
+                }
+//                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsAccuracy, recommendsDistance, locationOfVariable));
             }
         }
     }
