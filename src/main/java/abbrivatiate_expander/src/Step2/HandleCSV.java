@@ -199,19 +199,16 @@ public class HandleCSV {
                                 System.out.println("Method name:" + methodName);
                                 if (possibleWordArrayList.size() > 0) {
                                     System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
-                                    ArrayList<String> recommendsAccuracyTpe = new ArrayList<String>();
-//                                    ArrayList<Float> recommendsDistance = new ArrayList<Float>();
-                                    HashMap<AbbreviationRecommendVO, Float> map = new HashMap<>();
+                                    ArrayList<String> recommendsAccuracyType = new ArrayList<String>();
+                                    HashMap<String, Float> map = new HashMap<>();
                                     for (String recommendName : possibleWordArrayList) {
                                         Float distance = Levenshtein.getSimilarity(paramName, recommendName);
-                                        recommendsAccuracyTpe.add(utils.getAccuracyType(distance));
-//                                        recommendsDistance.add(distance);
-                                        map.put(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsAccuracyTpe, locationOfMethod),
-                                                distance);
+//                                        recommendsAccuracyType.add(utils.getAccuracyType(distance));
+                                        map.put(recommendName, distance);
                                     }
-                                    List<Map.Entry<AbbreviationRecommendVO, Float>> list = new ArrayList<>(map.entrySet());
-                                    Collections.sort(list, new Comparator<Map.Entry<AbbreviationRecommendVO, Float>>() {
-                                        public int compare(Map.Entry<AbbreviationRecommendVO, Float> o1, Map.Entry<AbbreviationRecommendVO, Float> o2) {
+                                    List<Map.Entry<String, Float>> list = new ArrayList<>(map.entrySet());
+                                    Collections.sort(list, new Comparator<Map.Entry<String, Float>>() {
+                                        public int compare(Map.Entry<String, Float> o1, Map.Entry<String, Float> o2) {
                                             if ((o1.getValue() - o2.getValue()) > 0)
                                                 return 1;
                                             else if ((o1.getValue() - o2.getValue()) == 0)
@@ -220,10 +217,12 @@ public class HandleCSV {
                                                 return -1;
                                         }
                                     });
-                                    for (Map.Entry<AbbreviationRecommendVO, Float> c : list) {
-                                        resList.add(c.getKey());
+                                    ArrayList<String> sortedPossiWordArrayList = new ArrayList<String>();
+                                    for (Map.Entry<String, Float> c : list) {
+                                        sortedPossiWordArrayList.add(c.getKey());
+                                        recommendsAccuracyType.add(utils.getAccuracyType(c.getValue()));
                                     }
-//                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsAccuracyTpe, recommendsDistance, locationOfMethod));
+                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, sortedPossiWordArrayList, recommendsAccuracyType, locationOfMethod));
                                 }
                             } else {
                                 System.out.println("Has no recommendMethodInvokedParams.");
@@ -333,17 +332,16 @@ public class HandleCSV {
                 System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
                 ArrayList<String> recommendsAccuracy = new ArrayList<String>();
 //                ArrayList<Float> recommendsDistance = new ArrayList<Float>();
-                HashMap<AbbreviationRecommendVO, Float> map = new HashMap<>();
+                HashMap<String, Float> map = new HashMap<>();
                 for (String recommendName : possibleWordArrayList) {
                     Float distance = Levenshtein.getSimilarity(variableName, recommendName);
-                    recommendsAccuracy.add(utils.getAccuracyType(distance));
+//                    recommendsAccuracy.add(utils.getAccuracyType(distance));
 //                    recommendsDistance.add(distance);
-                    map.put(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsAccuracy, locationOfVariable),
-                            distance);
+                    map.put(recommendName, distance);
                 }
-                List<Map.Entry<AbbreviationRecommendVO, Float>> list = new ArrayList<>(map.entrySet());
-                Collections.sort(list, new Comparator<Map.Entry<AbbreviationRecommendVO, Float>>() {
-                    public int compare(Map.Entry<AbbreviationRecommendVO, Float> o1, Map.Entry<AbbreviationRecommendVO, Float> o2) {
+                List<Map.Entry<String, Float>> list = new ArrayList<>(map.entrySet());
+                Collections.sort(list, new Comparator<Map.Entry<String, Float>>() {
+                    public int compare(Map.Entry<String, Float> o1, Map.Entry<String, Float> o2) {
                         if ((o1.getValue() - o2.getValue()) > 0)
                             return 1;
                         else if ((o1.getValue() - o2.getValue()) == 0)
@@ -352,10 +350,12 @@ public class HandleCSV {
                             return -1;
                     }
                 });
-                for (Map.Entry<AbbreviationRecommendVO, Float> c : list) {
-                    resList.add(c.getKey());
+                ArrayList<String> sortedPossiWordArrayList = new ArrayList<String>();
+                for (Map.Entry<String, Float> c : list) {
+                    sortedPossiWordArrayList.add(c.getKey());
+                    recommendsAccuracy.add(utils.getAccuracyType(c.getValue()));
                 }
-//                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsAccuracy, recommendsDistance, locationOfVariable));
+                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, sortedPossiWordArrayList, recommendsAccuracy, locationOfVariable));
             }
         }
     }
