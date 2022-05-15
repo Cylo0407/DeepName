@@ -7,6 +7,7 @@ import abbrivatiate_expander.src.expansion.AllExpansions;
 import com.example.deepname.Utils.Global;
 import com.example.deepname.Utils.Levenshtein;
 import com.example.deepname.VO.AbbreviationRecommendVO;
+import com.example.deepname.Utils.utils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -199,12 +200,14 @@ public class HandleCSV {
                                 System.out.println("Method name:" + methodName);
                                 if (possibleWordArrayList.size() > 0) {
                                     System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
+                                    ArrayList<String> recommendsAccuracyTpe = new ArrayList<String>();
                                     ArrayList<Float> recommendsDistance = new ArrayList<Float>();
                                     for (String recommendName : possibleWordArrayList) {
                                         Float distance = Levenshtein.getSimilarity(paramName, recommendName);
+                                        recommendsAccuracyTpe.add(utils.getAccuracyType(distance));
                                         recommendsDistance.add(distance);
                                     }
-                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsDistance, locationOfMethod));
+                                    resList.add(new AbbreviationRecommendVO(paramName, methodName, possibleWordArrayList, recommendsAccuracyTpe, recommendsDistance, locationOfMethod));
                                 }
                             } else {
                                 System.out.println("Has no recommendMethodInvokedParams.");
@@ -312,12 +315,14 @@ public class HandleCSV {
             System.out.println("Variable name:" + variableName);
             if (possibleWordArrayList.size() > 0) {
                 System.out.println("Possible recommendMethodInvokedParams names:" + String.join(",", possibleWordArrayList));
+                ArrayList<String> recommendsAccuracy = new ArrayList<String>();
                 ArrayList<Float> recommendsDistance = new ArrayList<Float>();
                 for (String recommendName : possibleWordArrayList) {
                     Float distance = Levenshtein.getSimilarity(variableName, recommendName);
+                    recommendsAccuracy.add(utils.getAccuracyType(distance));
                     recommendsDistance.add(distance);
                 }
-                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsDistance, locationOfVariable));
+                resList.add(new AbbreviationRecommendVO(variableName, callerMethodName, possibleWordArrayList, recommendsAccuracy, recommendsDistance, locationOfVariable));
             }
         }
     }

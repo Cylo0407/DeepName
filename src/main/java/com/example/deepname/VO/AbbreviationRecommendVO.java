@@ -1,13 +1,12 @@
 package com.example.deepname.VO;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class AbbreviationRecommendVO {
     private String param_name;
     private String method_name;
     private ArrayList<String> possible_recommends;
+    private ArrayList<String> recommends_accuracy_type;
     private ArrayList<Float> recommends_distance;
     private String param_location;
 
@@ -16,10 +15,11 @@ public class AbbreviationRecommendVO {
 
     }
 
-    public AbbreviationRecommendVO(String param_name, String method_name, ArrayList<String> possible_recommends, ArrayList<Float> recommends_distance, String param_location) {
+    public AbbreviationRecommendVO(String param_name, String method_name, ArrayList<String> possible_recommends, ArrayList<String> recommends_accuracy_type, ArrayList<Float> recommends_distance, String param_location) {
         this.param_name = param_name;
         this.method_name = method_name;
         this.possible_recommends = possible_recommends;
+        this.recommends_accuracy_type = recommends_accuracy_type;
         this.recommends_distance = recommends_distance;
         if (param_location == null) {
             this.param_location = "-1";
@@ -58,6 +58,14 @@ public class AbbreviationRecommendVO {
 
     public void setPossible_recommends(ArrayList<String> possible_recommends) {
         this.possible_recommends = possible_recommends;
+    }
+
+    public ArrayList<String> getRecommends_accuracy_type() {
+        return recommends_accuracy_type;
+    }
+
+    public void setRecommends_accuracy_type(ArrayList<String> recommends_accuracy_type) {
+        this.recommends_accuracy_type = recommends_accuracy_type;
     }
 
     public ArrayList<Float> getRecommends_distance() {

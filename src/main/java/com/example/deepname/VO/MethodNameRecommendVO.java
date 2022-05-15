@@ -1,22 +1,26 @@
 package com.example.deepname.VO;
 
+import java.util.ArrayList;
+
 public class MethodNameRecommendVO {
     private String method_name;
     private String method_signature;
     private String possible_recommend;
-    private float distance;
+    private String accuracy_type;
     private String method_location;
+    private ArrayList<String> method_params;
 
     public MethodNameRecommendVO() {
 
     }
 
-    public MethodNameRecommendVO(String method_name, String method_signature, String possible_recommend, float distance, String method_location) {
+    public MethodNameRecommendVO(String method_name, String method_signature, String possible_recommend, String accuracy_type, String method_location, ArrayList<String> method_params) {
         this.method_name = method_name;
         this.method_signature = method_signature;
         this.possible_recommend = possible_recommend;
-        this.distance = distance;
+        this.accuracy_type = accuracy_type;
         this.method_location = method_location;
+        this.method_params = method_params;
     }
 
     public String getMethod_name() {
@@ -35,12 +39,12 @@ public class MethodNameRecommendVO {
         this.possible_recommend = possible_recommend;
     }
 
-    public float getDistance() {
-        return distance;
+    public String getAccuracy_type() {
+        return accuracy_type;
     }
 
-    public void setDistance(float distance) {
-        this.distance = distance;
+    public void setAccuracy_type(String accuracy_type) {
+        this.accuracy_type = accuracy_type;
     }
 
     public String getMethod_location() {
@@ -57,5 +61,13 @@ public class MethodNameRecommendVO {
 
     public void setMethod_signature(String method_signature) {
         this.method_signature = method_signature;
+    }
+
+    public ArrayList<String> getMethod_params() {
+        return method_params;
+    }
+
+    public void setMethod_params(ArrayList<String> method_params) {
+        this.method_params = method_params;
     }
 }
